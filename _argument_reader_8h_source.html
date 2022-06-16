@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ShellFactory with github: lib/ShellFactory/src/ArgumentReader.h Source File</title>
+<title>ShellFactory with github: lib/ShellFactory/src/shell/ArgumentReader.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_97aefd0d527b934f1d99a682da8fe6a9.html">lib</a></li><li class="navelem"><a class="el" href="dir_a90dc9fb1e1790ee12a5e3e700235600.html">ShellFactory</a></li><li class="navelem"><a class="el" href="dir_c6e5b75e79514bf4642cad2072819bcb.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_97aefd0d527b934f1d99a682da8fe6a9.html">lib</a></li><li class="navelem"><a class="el" href="dir_a90dc9fb1e1790ee12a5e3e700235600.html">ShellFactory</a></li><li class="navelem"><a class="el" href="dir_c6e5b75e79514bf4642cad2072819bcb.html">src</a></li><li class="navelem"><a class="el" href="dir_c17acc4cbe9e39e8d83f5e5dc9a6d391.html">shell</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -89,23 +89,24 @@ $(function() {
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="class_argument_reader.html">   18</a></span><span class="keyword">class </span><a class="code hl_class" href="class_argument_reader.html">ArgumentReader</a></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">char</span> *cmdptr_;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">byte</span> *cmdptr_;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">char</span> separator_;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="class_argument_reader.html">ArgumentReader</a>(<span class="keywordtype">char</span> separator = <span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">void</span> begin(<span class="keywordtype">char</span> *str);</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    int8_t readLong(int32_t *arg, int32_t min = (<span class="keywordtype">long</span>)0x80000000, int32_t max = 0x7fffffff);</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    int8_t readInt(int16_t *arg, int16_t min = (<span class="keywordtype">int</span>)0x8000, int16_t max = 0x7fff);</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    int8_t readEnum(uint8_t *arg, PGM_P options, <span class="keywordtype">char</span> delimiter = <span class="charliteral">&#39;|&#39;</span>);</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    int16_t readString(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase, <span class="keywordtype">char</span> separator);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    int16_t readString(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase = <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    int16_t readToEnd(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase = <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keyword">static</span> <span class="keywordtype">void</span> printEnum(Print &amp;output, uint8_t value, PGM_P options, <span class="keywordtype">char</span> delimiter = <span class="charliteral">&#39;|&#39;</span>);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">char</span> *peek();</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>};</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#endif </span><span class="comment">//_ARGUMENT_READER_H_</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> atol(<span class="keyword">const</span> <span class="keywordtype">char</span> *str, <span class="keywordtype">long</span> *result);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_class" href="class_argument_reader.html">ArgumentReader</a>(<span class="keywordtype">char</span> separator = <span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">void</span> begin(<span class="keywordtype">byte</span> *cmdlinebuf);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    int8_t readLong(int32_t *arg, int32_t min = (<span class="keywordtype">long</span>)0x80000000, int32_t max = 0x7fffffff);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    int8_t readInt(int16_t *arg, int16_t min = (<span class="keywordtype">int</span>)0x8000, int16_t max = 0x7fff);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    int8_t readEnum(uint8_t *arg, PGM_P options, <span class="keywordtype">char</span> delimiter = <span class="charliteral">&#39;|&#39;</span>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    int16_t readString(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase, <span class="keywordtype">char</span> separator);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    int16_t readString(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    int16_t readToEnd(<span class="keywordtype">char</span> **arg, <span class="keywordtype">bool</span> uppercase = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keyword">static</span> <span class="keywordtype">void</span> printEnum(Print &amp;output, uint8_t value, PGM_P options, <span class="keywordtype">char</span> delimiter = <span class="charliteral">&#39;|&#39;</span>);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">char</span> *peek();</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>};</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#endif </span><span class="comment">//_ARGUMENT_READER_H_</span></div>
 <div class="ttc" id="aclass_argument_reader_html"><div class="ttname"><a href="class_argument_reader.html">ArgumentReader</a></div><div class="ttdef"><b>Definition:</b> ArgumentReader.h:19</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

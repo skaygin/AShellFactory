@@ -86,7 +86,7 @@ $(function() {
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;ShellFraming.h&quot;</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;ArgumentReader.h&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;shell/ArgumentReader.h&gt;</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#if !defined(SHELL_MAX_REQUEST_LEN)</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#define SHELL_MAX_REQUEST_LEN 80</span></div>
@@ -167,8 +167,8 @@ $(function() {
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    PGM_P user_command_defs_;</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    PGM_P admin_command_defs_;</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordtype">void</span> *head_node_;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keywordtype">char</span> request_buf_[SHELL_MAX_REQUEST_LEN + 1]; <span class="comment">//+1 for null termination</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">char</span> *request_buf_ptr_;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keywordtype">byte</span> request_buf_[SHELL_MAX_REQUEST_LEN + 1]; <span class="comment">//+1 for null termination</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">byte</span> *request_buf_ptr_;</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keyword">static</span> CommandHandlerFunc getFunctionByCommandDef_(<a class="code hl_struct" href="struct_command_mapping.html">CommandMapping</a> *);</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keyword">static</span> <a class="code hl_struct" href="struct_command_mapping.html">CommandMapping</a> *findCommandDef_(PGM_P pgmp, <span class="keywordtype">char</span> *cmd);</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keyword">static</span> <span class="keywordtype">void</span> printHelp_(Print &amp;out, PGM_P command_defs, <span class="keyword">const</span> <span class="keywordtype">char</span> *cmd);</div>
@@ -188,8 +188,8 @@ $(function() {
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordtype">void</span> printHelp(Print &amp;out, <span class="keywordtype">bool</span> admin, <span class="keywordtype">char</span> *cmd = 0);</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordtype">void</span> tick(<span class="keywordtype">bool</span> greedy = <span class="keyword">true</span>);</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    int8_t call(<span class="keyword">const</span> <span class="keywordtype">char</span> *command, Print &amp;response);</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordtype">void</span> run(<span class="keyword">const</span> <span class="keywordtype">char</span> *command, Print &amp;out);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    int8_t call(<span class="keywordtype">byte</span> *command, Print &amp;response);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordtype">void</span> run(<span class="keywordtype">byte</span> *command, Print &amp;out);</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordtype">void</span> run(<span class="keyword">const</span> __FlashStringHelper *command, Print &amp;out);</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keywordtype">char</span> *available(<span class="keywordtype">bool</span> greedy);</div>

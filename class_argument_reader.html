@@ -75,9 +75,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adb9d0cb5cd8429cf0e24d70348c446ee"><td class="memItemLeft" align="right" valign="top"><a id="adb9d0cb5cd8429cf0e24d70348c446ee" name="adb9d0cb5cd8429cf0e24d70348c446ee"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ArgumentReader</b> (char separator=' ')</td></tr>
 <tr class="separator:adb9d0cb5cd8429cf0e24d70348c446ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e246d7f37816095e4f001c873c162e9"><td class="memItemLeft" align="right" valign="top"><a id="a6e246d7f37816095e4f001c873c162e9" name="a6e246d7f37816095e4f001c873c162e9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (char *str)</td></tr>
-<tr class="separator:a6e246d7f37816095e4f001c873c162e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ed34991b3488833abe9351afb00067c"><td class="memItemLeft" align="right" valign="top"><a id="a2ed34991b3488833abe9351afb00067c" name="a2ed34991b3488833abe9351afb00067c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (byte *cmdlinebuf)</td></tr>
+<tr class="separator:a2ed34991b3488833abe9351afb00067c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92249b383e4d3bde2d4ffa4a93083fcb"><td class="memItemLeft" align="right" valign="top"><a id="a92249b383e4d3bde2d4ffa4a93083fcb" name="a92249b383e4d3bde2d4ffa4a93083fcb"></a>
 int8_t&#160;</td><td class="memItemRight" valign="bottom"><b>readLong</b> (int32_t *arg, int32_t min=(long) 0x80000000, int32_t max=0x7fffffff)</td></tr>
 <tr class="separator:a92249b383e4d3bde2d4ffa4a93083fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,13 +102,16 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>peek</b> ()</td></t
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ab1b792b387297062e6e5fbcb4ea1ef5e"><td class="memItemLeft" align="right" valign="top"><a id="ab1b792b387297062e6e5fbcb4ea1ef5e" name="ab1b792b387297062e6e5fbcb4ea1ef5e"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>atol</b> (const char *str, long *result)</td></tr>
+<tr class="separator:ab1b792b387297062e6e5fbcb4ea1ef5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08d50cbf0ac47c14ff55248b655fa31a"><td class="memItemLeft" align="right" valign="top"><a id="a08d50cbf0ac47c14ff55248b655fa31a" name="a08d50cbf0ac47c14ff55248b655fa31a"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>printEnum</b> (Print &amp;output, uint8_t value, PGM_P options, char delimiter='|')</td></tr>
 <tr class="separator:a08d50cbf0ac47c14ff55248b655fa31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>lib/ShellFactory/src/<a class="el" href="_argument_reader_8h_source.html">ArgumentReader.h</a></li>
-<li>lib/ShellFactory/src/ArgumentReader.cpp</li>
+<li>lib/ShellFactory/src/shell/<a class="el" href="_argument_reader_8h_source.html">ArgumentReader.h</a></li>
+<li>lib/ShellFactory/src/shell/ArgumentReader.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
