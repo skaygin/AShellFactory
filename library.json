@@ -1,0 +1,23 @@
+{
+  "name": "ShellFactory",
+  "version": "1.0.0",
+  "keywords": "shell,cli,command,arduino",
+  "description": "A small footprint and feature rich software library for Arduino compatible boards to provide CLI (command line interface) for the firmware easily and reliably.",
+  "authors":
+  [
+    {
+        "name": "Serkan KAYGIN",
+        "url": "https://github.com/skaygin"
+    }
+  ],
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/skaygin/ShellFactory.git"
+  },
+  "frameworks": "arduino",
+  "platforms": 
+  [
+    "atmelavr"
+  ]
+}
