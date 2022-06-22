@@ -32,10 +32,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade platformio
-          wget https://github.com/skaygin/ShellFactory/archive/refs/heads/main.zip -O /tmp/shellfactory.zip
-          unzip /tmp/shellfactory.zip -d /tmp
+          wget https://github.com/skaygin/ArduinoShell/archive/refs/heads/main.zip -O /tmp/ashell.zip
+          unzip /tmp/ashell.zip -d /tmp
 
       - name: Run PlatformIO
-        run: pio ci --lib="/tmp/ShellFactory-main/lib/ShellFactory/src" --board=uno
+        run: pio ci --lib="/tmp/ArduinoShell-main/lib/ArduinoShell/src" --board=uno
         env:
           PLATFORMIO_CI_SRC: ${{ matrix.example }}

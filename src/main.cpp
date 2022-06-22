@@ -21,15 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifdef ENV_NATIVE
-#include "ArduinoFake.h"
-//#include "Arduino.h"
-#include <stdio.h>
-#else
 #include "Arduino.h"
-#endif
-
-#include <ShellFactory.h>
+#include <Shell.h>
+#include <ShellCmdRepository.h>
 
 COMMAND_HANDLER(VER, request, response, "Displays firmware version.")
 {
@@ -37,19 +31,21 @@ COMMAND_HANDLER(VER, request, response, "Displays firmware version.")
     return 0;
 }
 
-const CommandMapping PROGMEM user_commands[] =
-    {
-        MAP_HANDLER(VER),
-        MAP_HANDLER(HELP),
-        0 // must end with zero to indicate end of commands
-};        //{0, 0, 0}
+DECLARE_SHELL_COMMANDS(user_commands){
+    SHELL_COMMAND(VER),
+    SHELL_COMMAND(PIN),
+    SHELL_COMMAND(APIN),
+    SHELL_COMMAND(EEREAD),
+    SHELL_COMMAND(EEWRITE),
+    SHELL_COMMAND(HELP),
+    END_SHELL_COMMANDS};
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Shell.begin(user_commands);
     Shell.addEndpoint(Serial);
-    Shell.run(F("VER"), Serial);
+    Shell.exec(F("VER"), Serial);
 }
 
 void loop()
@@ -104,7 +100,7 @@ int main()
     // printf("hello world\r\n");
     Shell.begin(user_commands);
     //   Shell.addEndpoint(stdout);
-    Shell.run(F("VER"), stdprint);
+    Shell.exec(F("VER"), stdprint);
     printf("exiting\r\n");
     return 0;
 }

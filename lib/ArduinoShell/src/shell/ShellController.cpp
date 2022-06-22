@@ -117,7 +117,7 @@ ShellController::ShellController()
   print_mode_ = PRINTMODE_IGNORE;
 }
 
-void ShellController::begin(const CommandMapping user_commands[], char prompt)
+void ShellController::begin(const ShellCommand user_commands[], char prompt)
 {
   ((DefaultFraming *)default_cmd_framing_)->begin(prompt);
   user_command_defs_ = (PGM_P)user_commands;
@@ -125,7 +125,7 @@ void ShellController::begin(const CommandMapping user_commands[], char prompt)
   request_buf_ptr_ = &request_buf_[0];
 }
 
-void ShellController::setAdminCommands(const CommandMapping admin_commands[])
+void ShellController::setAdminCommands(const ShellCommand admin_commands[])
 {
   admin_command_defs_ = (PGM_P)admin_commands;
 }
@@ -205,7 +205,7 @@ size_t ShellController::write(uint8_t c)
 }
 
 // assumes that bufptr point to the start char of command, spaces are converted to null, cmdptr points to the parameters
-CommandMapping *ShellController::findCommandDef_(PGM_P pgmp, char *chptr)
+ShellCommand *ShellController::findCommandDef_(PGM_P pgmp, char *chptr)
 {
   PGM_P cmd = pgmp;
   while (cmd)
@@ -214,8 +214,8 @@ CommandMapping *ShellController::findCommandDef_(PGM_P pgmp, char *chptr)
     if (!cmdp)
       break;
     if (strcasecmp_P(chptr, cmdp) == 0)
-      return (CommandMapping *)cmd;
-    cmd += sizeof(CommandMapping);
+      return (ShellCommand *)cmd;
+    cmd += sizeof(ShellCommand);
   }
   return 0;
 }
@@ -262,7 +262,7 @@ void ShellController::printHelp_(Print &out, PGM_P command_defs, const char *cmd
           return;                  // SPECIFIC returns after found
         }
       }
-      command_defs += sizeof(CommandMapping);
+      command_defs += sizeof(ShellCommand);
     }
   // ALL
   if (cmd)
@@ -329,9 +329,9 @@ void ShellController::endResponse_(Print *out, int8_t error_code)
   }
 }
 
-CommandMapping *ShellController::findCommandDefinition(char *command)
+ShellCommand *ShellController::findCommandDefinition(char *command)
 {
-  CommandMapping *cmddef = findCommandDef_((PGM_P)user_command_defs_, command);
+  ShellCommand *cmddef = findCommandDef_((PGM_P)user_command_defs_, command);
   if (!cmddef)
     cmddef = findCommandDef_((PGM_P)admin_command_defs_, command);
   return cmddef;
@@ -339,22 +339,22 @@ CommandMapping *ShellController::findCommandDefinition(char *command)
 
 CommandHandlerFunc ShellController::findCommandFunction(char *command)
 {
-  CommandMapping *cmddef = findCommandDefinition(command);
+  ShellCommand *cmddef = findCommandDefinition(command);
   return cmddef ? getFunctionByCommandDef_(cmddef) : 0;
 }
 
-CommandHandlerFunc ShellController::getFunctionByCommandDef_(CommandMapping *cmd)
+CommandHandlerFunc ShellController::getFunctionByCommandDef_(ShellCommand *cmd)
 {
   return (CommandHandlerFunc)((PGM_P)pgm_read_ptr(&(cmd->handler)));
 }
 
-int8_t ShellController::call(byte *command, Print &response)
+int8_t ShellController::call(byte *command_line, Print &response)
 {
-  char *cmdstart; // = command;
-  request_->begin(command);
+  char *cmdstart;
+  request_->begin(command_line);
   request_->readString(&cmdstart, true);
   // _request_buf_ptr points the first parameter (or null)
-  CommandMapping *cmd = findCommandDefinition(cmdstart);
+  ShellCommand *cmd = findCommandDefinition(cmdstart);
   if (!cmd)
     return SHELL_RESPONSE_ERR_BAD_COMMAND;
   else
@@ -367,18 +367,18 @@ int8_t ShellController::call(byte *command, Print &response)
   }
 }
 
-void ShellController::run(byte *command, Print &out)
+void ShellController::exec(byte *command_line, Print &out)
 {
   beginResponse_(&out);
-  int8_t errcode = call(command, out);
+  int8_t errcode = call(command_line, out);
   endResponse_(&out, errcode);
 }
 
-void ShellController::run(const __FlashStringHelper *command, Print &out)
+void ShellController::exec(const __FlashStringHelper *command_line, Print &out)
 {
   byte *start = &request_buf_[0];
-  strncpy_P((char *)start, (PGM_P)command, SHELL_MAX_REQUEST_LEN);
-  run(start, out);
+  strncpy_P((char *)start, (PGM_P)command_line, SHELL_MAX_REQUEST_LEN);
+  exec(start, out);
 }
 
 char *ShellController::available(bool greedy)
@@ -431,7 +431,7 @@ void ShellController::tick(bool greedy)
   byte *cmdp = (byte *)available(greedy); // sets _requesting_stream internally
   if (cmdp)
   {
-    run(cmdp, *this); //_response_out
+    exec(cmdp, *this); //_response_out
   }
 }
 
@@ -439,7 +439,8 @@ ShellController Shell; // create object
 
 // *************** BUILT-IN COMMANDS *************************
 
-int8_t __run__HELP(ArgumentReader &request, Print &response)
+/*
+IMPLEMENT_COMMAND_HANDLER(HELP, request, response)
 {
   char *cmd;
   bool isadmin = false;
@@ -462,3 +463,4 @@ int8_t __run__HELP(ArgumentReader &request, Print &response)
     context_->printHelp(response, isadmin, cmd);
   return 0;
 }
+*/
