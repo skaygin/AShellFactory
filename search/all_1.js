@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['commandmapping_0',['CommandMapping',['../struct_command_mapping.html',1,'']]]
+  ['defaultframing_0',['DefaultFraming',['../class_default_framing.html',1,'']]]
 ];

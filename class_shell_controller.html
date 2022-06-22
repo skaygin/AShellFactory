@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ShellFactory with github: ShellController Class Reference</title>
+<title>Arduino Shell with GitHub: ShellController Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">ShellFactory with github
+   <div id="projectname">Arduino Shell with GitHub
    </div>
   </td>
  </tr>
@@ -78,12 +78,12 @@ Inheritance diagram for ShellController:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab316bf483d2b227a2c8ec4fe70d1a4df"><td class="memItemLeft" align="right" valign="top"><a id="ab316bf483d2b227a2c8ec4fe70d1a4df" name="ab316bf483d2b227a2c8ec4fe70d1a4df"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (const <a class="el" href="struct_command_mapping.html">CommandMapping</a> user_commands[], char prompt='&gt;')</td></tr>
-<tr class="separator:ab316bf483d2b227a2c8ec4fe70d1a4df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9728edd034156b956346784238dde69"><td class="memItemLeft" align="right" valign="top"><a id="af9728edd034156b956346784238dde69" name="af9728edd034156b956346784238dde69"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setAdminCommands</b> (const <a class="el" href="struct_command_mapping.html">CommandMapping</a> admin_commands[])</td></tr>
-<tr class="separator:af9728edd034156b956346784238dde69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ff59272feb9405c7eb0bfb29bca6cd"><td class="memItemLeft" align="right" valign="top"><a id="a54ff59272feb9405c7eb0bfb29bca6cd" name="a54ff59272feb9405c7eb0bfb29bca6cd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (const <a class="el" href="struct_shell_command.html">ShellCommand</a> user_commands[], char prompt='&gt;')</td></tr>
+<tr class="separator:a54ff59272feb9405c7eb0bfb29bca6cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accc22bbc7f8bcae0496a72cbcb42e40e"><td class="memItemLeft" align="right" valign="top"><a id="accc22bbc7f8bcae0496a72cbcb42e40e" name="accc22bbc7f8bcae0496a72cbcb42e40e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setAdminCommands</b> (const <a class="el" href="struct_shell_command.html">ShellCommand</a> admin_commands[])</td></tr>
+<tr class="separator:accc22bbc7f8bcae0496a72cbcb42e40e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a964e80610b0ebca8b1b109432626621a"><td class="memItemLeft" align="right" valign="top"><a id="a964e80610b0ebca8b1b109432626621a" name="a964e80610b0ebca8b1b109432626621a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addEndpoint</b> (Stream &amp;stream)</td></tr>
 <tr class="separator:a964e80610b0ebca8b1b109432626621a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -99,21 +99,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>printHelp</b> (Print 
 <tr class="memitem:ac6fc29e8a290679fc0298c4db4e79cce"><td class="memItemLeft" align="right" valign="top"><a id="ac6fc29e8a290679fc0298c4db4e79cce" name="ac6fc29e8a290679fc0298c4db4e79cce"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>tick</b> (bool greedy=true)</td></tr>
 <tr class="separator:ac6fc29e8a290679fc0298c4db4e79cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2c122cf8393d52a798e2b4bfbe3278b"><td class="memItemLeft" align="right" valign="top"><a id="aa2c122cf8393d52a798e2b4bfbe3278b" name="aa2c122cf8393d52a798e2b4bfbe3278b"></a>
-int8_t&#160;</td><td class="memItemRight" valign="bottom"><b>call</b> (byte *command, Print &amp;response)</td></tr>
-<tr class="separator:aa2c122cf8393d52a798e2b4bfbe3278b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bedae3e6255aad3998aa5519c2d0af4"><td class="memItemLeft" align="right" valign="top"><a id="a2bedae3e6255aad3998aa5519c2d0af4" name="a2bedae3e6255aad3998aa5519c2d0af4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (byte *command, Print &amp;out)</td></tr>
-<tr class="separator:a2bedae3e6255aad3998aa5519c2d0af4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e93a13870c17f3253b18c22ad96d9f9"><td class="memItemLeft" align="right" valign="top"><a id="a2e93a13870c17f3253b18c22ad96d9f9" name="a2e93a13870c17f3253b18c22ad96d9f9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const __FlashStringHelper *command, Print &amp;out)</td></tr>
-<tr class="separator:a2e93a13870c17f3253b18c22ad96d9f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e049fb6517be5b5036cc8c864b9bc25"><td class="memItemLeft" align="right" valign="top"><a id="a6e049fb6517be5b5036cc8c864b9bc25" name="a6e049fb6517be5b5036cc8c864b9bc25"></a>
+int8_t&#160;</td><td class="memItemRight" valign="bottom"><b>call</b> (byte *command_line, Print &amp;response)</td></tr>
+<tr class="separator:a6e049fb6517be5b5036cc8c864b9bc25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5da382bd2783f012fd7fa7d6a95e2d8"><td class="memItemLeft" align="right" valign="top"><a id="ad5da382bd2783f012fd7fa7d6a95e2d8" name="ad5da382bd2783f012fd7fa7d6a95e2d8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> (byte *command_line, Print &amp;out)</td></tr>
+<tr class="separator:ad5da382bd2783f012fd7fa7d6a95e2d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11089b213c9b9b2d4870bb18d7c7c9c6"><td class="memItemLeft" align="right" valign="top"><a id="a11089b213c9b9b2d4870bb18d7c7c9c6" name="a11089b213c9b9b2d4870bb18d7c7c9c6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> (const __FlashStringHelper *command_line, Print &amp;out)</td></tr>
+<tr class="separator:a11089b213c9b9b2d4870bb18d7c7c9c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab41c761e6c05239ddcef2543a5f06e5e"><td class="memItemLeft" align="right" valign="top"><a id="ab41c761e6c05239ddcef2543a5f06e5e" name="ab41c761e6c05239ddcef2543a5f06e5e"></a>
 char *&#160;</td><td class="memItemRight" valign="bottom"><b>available</b> (bool greedy)</td></tr>
 <tr class="separator:ab41c761e6c05239ddcef2543a5f06e5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa51b61bba2a8c2488fa2873be95d750d"><td class="memItemLeft" align="right" valign="top"><a id="aa51b61bba2a8c2488fa2873be95d750d" name="aa51b61bba2a8c2488fa2873be95d750d"></a>
-<a class="el" href="struct_command_mapping.html">CommandMapping</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandDefinition</b> (char *command)</td></tr>
-<tr class="separator:aa51b61bba2a8c2488fa2873be95d750d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dfb5ae507b5846b61f9ddeac735e348"><td class="memItemLeft" align="right" valign="top"><a id="a4dfb5ae507b5846b61f9ddeac735e348" name="a4dfb5ae507b5846b61f9ddeac735e348"></a>
+<a class="el" href="struct_shell_command.html">ShellCommand</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandDefinition</b> (char *command)</td></tr>
+<tr class="separator:a4dfb5ae507b5846b61f9ddeac735e348"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af506bf000a69294d940f5fc109620888"><td class="memItemLeft" align="right" valign="top"><a id="af506bf000a69294d940f5fc109620888" name="af506bf000a69294d940f5fc109620888"></a>
 CommandHandlerFunc&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandFunction</b> (char *command)</td></tr>
 <tr class="separator:af506bf000a69294d940f5fc109620888"><td class="memSeparator" colspan="2">&#160;</td></tr>
