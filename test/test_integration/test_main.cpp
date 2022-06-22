@@ -23,14 +23,14 @@ SOFTWARE.
 */
 #include <Arduino.h>
 #include <unity.h>
-#include <ShellFactory.h>
+#include <Shell.h>
 #include <TesterStream.h>
 
 TesterStream tester;
 TesterStream tester2;
 ArgumentReader arg;
 
-// pio ci src/main.cpp  --lib="./lib/ShellFactory/src" --board=nanoatmega168 --board=uno --board=megaatmega2560 --board=leonardo
+// pio ci src/main.cpp  --lib="./lib/ArduinoShell/src" --board=nanoatmega168 --board=uno --board=megaatmega2560 --board=leonardo
 
 #define handler(C, HSTR) COMMAND_HANDLER(C, request, response, HSTR)
 
@@ -79,38 +79,34 @@ handler(WHO, "Displays name of the requesting endpoint.")
 }
 
 /*
-const CommandMapping PROGMEM user_commands[] =
-    {
-        MAP_HANDLER(VER),
-        MAP_HANDLER(TEST),
-        MAP_HANDLER(A),
-        MAP_HANDLER(RESET),
-        MAP_HANDLER(MEM),
-        MAP_HANDLER(WHO),
-        MAP_HANDLER(DPIN),
-        MAP_HANDLER(APIN),
-        MAP_HANDLER(HELP),
-        0 // must end with zero to indicate end of commands
+DECLARE_SHELL_COMMANDS(user_commands){
+        SHELL_COMMAND(VER),
+        SHELL_COMMAND(TEST),
+        SHELL_COMMAND(A),
+        SHELL_COMMAND(RESET),
+        SHELL_COMMAND(MEM),
+        SHELL_COMMAND(WHO),
+        SHELL_COMMAND(DPIN),
+        SHELL_COMMAND(APIN),
+        SHELL_COMMAND(HELP),
+        END_SHELL_COMMANDS
 };
 
-const CommandMapping PROGMEM admin_commands[] =
-    {
-        MAP_HANDLER(EEREAD),
-        MAP_HANDLER(EEWRITE),
-        MAP_HANDLER(FRAMING),
-        0 // must end with zero to indicate end of commands
+DECLARE_SHELL_COMMANDS(admin_commands){
+        SHELL_COMMAND(EEREAD),
+        SHELL_COMMAND(EEWRITE),
+        SHELL_COMMAND(FRAMING),
+        END_SHELL_COMMANDS
 };
 */
 
-const CommandMapping PROGMEM user_commands[] =
-    {
-        MAP_HANDLER(VER),
-        MAP_HANDLER(TEST),
-        MAP_HANDLER(A),
-        MAP_HANDLER(WHO),
-        MAP_HANDLER(HELP),
-        0 // must end with zero to indicate end of commands
-};
+DECLARE_SHELL_COMMANDS(user_commands){
+    SHELL_COMMAND(VER),
+    SHELL_COMMAND(TEST),
+    SHELL_COMMAND(A),
+    SHELL_COMMAND(WHO),
+    SHELL_COMMAND(HELP),
+    END_SHELL_COMMANDS};
 
 void test_ver_command(void)
 {
@@ -132,9 +128,9 @@ void test_all_commands()
 
 void test_run_externally()
 {
-    TEST_ASSERT_EQUAL_INT8(0, tester2.call("VER"));
+    TEST_ASSERT_EQUAL_INT8(0, tester2.call(F("VER")));
     TEST_ASSERT_EQUAL_STRING(tester2.response(), ("Tester Version 1.0"));
-    TEST_ASSERT_EQUAL_INT8(0, tester.call("VER"));
+    TEST_ASSERT_EQUAL_INT8(0, tester.call(F("VER")));
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("Tester Version 1.0"));
 }
 
@@ -189,7 +185,7 @@ void test_break_down_tick()
     tester.execute(F("TeST 8\r"), false);
     char *str = Shell.available(true);
     TEST_ASSERT_EQUAL_STRING(str, ("TeST 8"));
-    Shell.run((byte *)str, tester);
+    Shell.exec((byte *)str, tester);
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("test executed with params:8,\r\n~"));
     // lower level
     byte cmd[] = "TeST 7";
@@ -210,11 +206,11 @@ void test_external_executor()
     arg.begin(&cmdarg[0]);
     func(arg, tester); //__run__TEST(pr);
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("test executed with params:9,"));
-    Shell.run(F("test 11"), tester);
+    Shell.exec(F("test 11"), tester);
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("test executed with params:11,\r\n~"));
-    Shell.run(F("test 12"), tester);
+    Shell.exec(F("test 12"), tester);
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("test executed with params:12,\r\n~"));
-    Shell.run(F("UNKNOWN"), tester);
+    Shell.exec(F("UNKNOWN"), tester);
     TEST_ASSERT_EQUAL_STRING(tester.response(), ("ERR:Unknown command\r\n~"));
 }
 

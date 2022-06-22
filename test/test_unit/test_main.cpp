@@ -24,7 +24,7 @@ SOFTWARE.
 #include <Arduino.h>
 #include <unity.h>
 #include <TesterPrint.h>
-#include <ShellFactory.h>
+#include <Shell.h>
 
 ArgumentReader arg;
 TesterPrint testout;
@@ -37,12 +37,10 @@ handler(VER, "Displays firmware version.")
     return 0;
 }
 
-const CommandMapping PROGMEM user_commands[] =
-    {
-        MAP_HANDLER(VER),
-        MAP_HANDLER(HELP),
-        0 // must end with zero to indicate end of commands
-};
+DECLARE_SHELL_COMMANDS(user_commands){
+    SHELL_COMMAND(VER),
+    SHELL_COMMAND(HELP),
+    END_SHELL_COMMANDS};
 
 void setUp(void)
 {

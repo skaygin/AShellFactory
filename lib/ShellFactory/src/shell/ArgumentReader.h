@@ -38,6 +38,11 @@ SOFTWARE.
 
 #include <Arduino.h>
 
+/**
+ * @brief Command line parser which reads arguments sequentially.
+ * Supports strings, numbers, enumerations.
+ * Decimal, binary and hexadecimal integers are accepted.
+ */
 class ArgumentReader
 {
 private:

@@ -1,5 +1,5 @@
 {
-  "name": "ShellFactory",
+  "name": "ArduinoShell",
   "version": "1.0.0",
   "keywords": "shell,cli,command,arduino",
   "description": "A small footprint and feature rich software library for Arduino compatible boards to provide CLI (command line interface) for the firmware easily and reliably.",
@@ -13,7 +13,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/skaygin/ShellFactory.git"
+    "url": "https://github.com/skaygin/ArduinoShell.git"
   },
   "frameworks": "arduino",
   "platforms": 

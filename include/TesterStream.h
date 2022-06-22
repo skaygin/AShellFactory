@@ -1,6 +1,6 @@
 #ifndef _TESTER_STREAM_H_
 #define _TESTER_STREAM_H_
-#include <ShellFactory.h>
+#include <Shell.h>
 
 #define INBUFSIZE 90
 #define RESPONSEBUFSIZE 512 // note: this should be longer than help text (longest response)
@@ -53,10 +53,13 @@ public:
             Shell.tick(true);
     }
 
-    int8_t call(const char *command)
+    int8_t call(const __FlashStringHelper *command_line)
     {
+        inhead = &inbuf[0];
+        input(command_line);
+        *(inhead++) = 0;
         reset_response();
-        uint8_t ret = Shell.call(command, *this);
+        uint8_t ret = Shell.call(inbuf, *this);
         responsebuf[responselen] = 0;
         return ret;
     }

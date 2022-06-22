@@ -37,8 +37,8 @@ SOFTWARE.
 // First open source version
 
 #include <Arduino.h>
+#include <ShellCommon.h>
 #include "ShellFraming.h"
-#include <shell/ArgumentReader.h>
 
 #if !defined(SHELL_MAX_REQUEST_LEN)
 #define SHELL_MAX_REQUEST_LEN 80
@@ -48,44 +48,7 @@ SOFTWARE.
 #define SHELL_HELP_ALIGN_MAX_COMMAND_LEN 9
 #endif
 
-typedef int8_t (*CommandHandlerFunc)(ArgumentReader &, Print &);
-
-struct CommandMapping
-{
-    PGM_P command;
-    CommandHandlerFunc handler;
-    PGM_P helptext;
-};
-
-#define COMMAND_HANDLER(C, REQ, RESP, HELPSTR) \
-    const char __cmd__##C[] PROGMEM = #C;      \
-    const char __hlp__##C[] PROGMEM = HELPSTR; \
-    int8_t __run__##C(ArgumentReader &REQ, Print &RESP)
-
-#define EXTERN_COMMAND_HANDLER(C, REQ, RESP, HELPSTR) \
-    const char __cmd__##C[] PROGMEM = #C;             \
-    const char __hlp__##C[] PROGMEM = HELPSTR;        \
-    extern int8_t __run__##C(ArgumentReader &REQ, Print &RESP)
-
-#define MAP_HANDLER(C) \
-    (CommandMapping) { __cmd__##C, &__run__##C, __hlp__##C }
-
-// zero returned on successful execution
-#define SHELL_RESPONSE_OK 0
-
 const char PSTR_SHELL_RESPONSE_ERR_PREFIX[] PROGMEM = "ERR:";
-
-// These error codes should be sequential in ascending order
-const int8_t SHELL_RESPONSE_ERR_CUSTOM_PREFIX = 0; // negative return values are displayed with this prefix
-const int8_t SHELL_RESPONSE_ERR_BAD_ARGUMENT = 1;
-const int8_t SHELL_RESPONSE_ERR_TIMEOUT = 2;
-const int8_t SHELL_RESPONSE_ERR_ILLEGAL_STATE = 3;
-const int8_t SHELL_RESPONSE_ERR_IO_ERROR = 4;
-const int8_t SHELL_RESPONSE_ERR_COMMUNICATION_FAULT = 5;
-const int8_t SHELL_RESPONSE_ERR_ILLEGAL_OPERATION = 6;
-
-// remember to increment count if new response errors are added
-#define SHELL_RESPONSE_ERROR_COUNT 7
 
 const char PSTR_SHELL_RESPONSE_ERR_CUSTOM_PREFIX[] PROGMEM = "Custom-Error";
 const char PSTR_SHELL_RESPONSE_ERR_BAD_ARGUMENT[] PROGMEM = "Bad or missing argument";
@@ -96,7 +59,7 @@ const char PSTR_SHELL_RESPONSE_ERR_COMMUNICATION_FAULT[] PROGMEM = "Communicatio
 const char PSTR_SHELL_RESPONSE_ERR_ILLEGAL_OPERATION[] PROGMEM = "Illegal operation";
 
 // THIS ORDER IS IMPORTANT, MUST FOLLOW THE ORDER IN CORRESPONDING DEFINITIONS
-PGM_P const response_error_strings[] PROGMEM =
+PGM_P const response_error_strings[SHELL_RESPONSE_ERROR_COUNT] PROGMEM =
     {
         PSTR_SHELL_RESPONSE_ERR_CUSTOM_PREFIX,
         PSTR_SHELL_RESPONSE_ERR_BAD_ARGUMENT,
@@ -121,8 +84,8 @@ private:
     void *head_node_;
     byte request_buf_[SHELL_MAX_REQUEST_LEN + 1]; //+1 for null termination
     byte *request_buf_ptr_;
-    static CommandHandlerFunc getFunctionByCommandDef_(CommandMapping *);
-    static CommandMapping *findCommandDef_(PGM_P pgmp, char *cmd);
+    static CommandHandlerFunc getFunctionByCommandDef_(ShellCommand *);
+    static ShellCommand *findCommandDef_(PGM_P pgmp, char *cmd);
     static void printHelp_(Print &out, PGM_P command_defs, const char *cmd);
     void printError_(Print &out, int8_t errorcode);
     void endExecute_();
@@ -132,20 +95,20 @@ private:
 public:
     static ShellController *context();
     ShellController();
-    void begin(const CommandMapping user_commands[], char prompt = '>');
-    void setAdminCommands(const CommandMapping admin_commands[]);
+    void begin(const ShellCommand user_commands[], char prompt = '>');
+    void setAdminCommands(const ShellCommand admin_commands[]);
     void addEndpoint(Stream &stream);
     void removeEndpoint(Stream &stream);
     Stream *getRequestingEndpoint();
     void printHelp(Print &out, bool admin, char *cmd = 0);
 
     void tick(bool greedy = true);
-    int8_t call(byte *command, Print &response);
-    void run(byte *command, Print &out);
-    void run(const __FlashStringHelper *command, Print &out);
+    int8_t call(byte *command_line, Print &response);
+    void exec(byte *command_line, Print &out);
+    void exec(const __FlashStringHelper *command_line, Print &out);
 
     char *available(bool greedy);
-    CommandMapping *findCommandDefinition(char *command);
+    ShellCommand *findCommandDefinition(char *command);
     CommandHandlerFunc findCommandFunction(char *command);
     void setFraming(ShellFraming *framing);
     virtual size_t write(uint8_t c);
@@ -153,8 +116,6 @@ public:
 
 extern ShellController Shell;
 
-//***************************** ESSENTIAL/COMMON COMMANDS *****************
-
-EXTERN_COMMAND_HANDLER(HELP, request, response, "Provides Help information for commands. [-a] [<cmd>]");
+// DECLARE_COMMAND_HANDLER(HELP, "Provides Help information for commands. [-a] [<cmd>]");
 
 #endif //_SHELL_CONTROLLER_H

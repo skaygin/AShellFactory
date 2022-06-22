@@ -21,22 +21,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _SHELL_FACTORY_H
-#define _SHELL_FACTORY_H
+#include "ShellCmdPIN.h"
 
-//********************************
-// Shell Factory for Projects based on Arduino compatible boards
-// Version 1.0
-//
-//
-// By Serkan KAYGIN
-//********************************
+IMPLEMENT_COMMAND_HANDLER(PIN, request, response)
+{
+    int16_t pin;
+    if (!request.readInt(&pin))
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    uint8_t value;
+    PGM_P options = PSTR("LOW|HIGH|INPUT|OUTPUT|PULLUP");
+    int8_t ret = request.readEnum(&value, options);
+    if (ret < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    if (ret)
+    {
+        if (value < 2) // low,high
+            digitalWrite(pin, value);
+        else // input,output,pullup
+            pinMode(pin, value - 2);
+    }
+    else
+        value = digitalRead(pin);
+    response.print(pin);
+    response.write(' ');
+    ArgumentReader::printEnum(response, value, options);
+    return 0;
+}
 
-// VERSION HISTORY:
-// v1.0
-// First open source version
-
-#include <Arduino.h>
-#include "shell/ShellController.h"
-
-#endif //_SHELL_FACTORY_H
+IMPLEMENT_COMMAND_HANDLER(APIN, request, response)
+{
+    int16_t pin;
+    if (!request.readInt(&pin))
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    int16_t value;
+    if (!request.readInt(&value))
+        value = analogRead(pin);
+    else
+        analogWrite(pin, value);
+    response.print(pin);
+    response.write(' ');
+    response.print(value);
+    return 0;
+}
