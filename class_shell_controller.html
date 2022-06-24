@@ -78,12 +78,12 @@ Inheritance diagram for ShellController:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a54ff59272feb9405c7eb0bfb29bca6cd"><td class="memItemLeft" align="right" valign="top"><a id="a54ff59272feb9405c7eb0bfb29bca6cd" name="a54ff59272feb9405c7eb0bfb29bca6cd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (const <a class="el" href="struct_shell_command.html">ShellCommand</a> user_commands[], char prompt='&gt;')</td></tr>
-<tr class="separator:a54ff59272feb9405c7eb0bfb29bca6cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accc22bbc7f8bcae0496a72cbcb42e40e"><td class="memItemLeft" align="right" valign="top"><a id="accc22bbc7f8bcae0496a72cbcb42e40e" name="accc22bbc7f8bcae0496a72cbcb42e40e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setAdminCommands</b> (const <a class="el" href="struct_shell_command.html">ShellCommand</a> admin_commands[])</td></tr>
-<tr class="separator:accc22bbc7f8bcae0496a72cbcb42e40e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3edbb4cf3baf27a8035efaba34505900"><td class="memItemLeft" align="right" valign="top"><a id="a3edbb4cf3baf27a8035efaba34505900" name="a3edbb4cf3baf27a8035efaba34505900"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (const <a class="el" href="struct_shell_command_struct.html">ShellCommandStruct</a> user_commands[], const __FlashStringHelper *prompt=0)</td></tr>
+<tr class="separator:a3edbb4cf3baf27a8035efaba34505900"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab025dbf91cc8a2849c66ec8bc81f43fe"><td class="memItemLeft" align="right" valign="top"><a id="ab025dbf91cc8a2849c66ec8bc81f43fe" name="ab025dbf91cc8a2849c66ec8bc81f43fe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setAdminCommands</b> (const <a class="el" href="struct_shell_command_struct.html">ShellCommandStruct</a> admin_commands[])</td></tr>
+<tr class="separator:ab025dbf91cc8a2849c66ec8bc81f43fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a964e80610b0ebca8b1b109432626621a"><td class="memItemLeft" align="right" valign="top"><a id="a964e80610b0ebca8b1b109432626621a" name="a964e80610b0ebca8b1b109432626621a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addEndpoint</b> (Stream &amp;stream)</td></tr>
 <tr class="separator:a964e80610b0ebca8b1b109432626621a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -111,9 +111,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> (const __Fla
 <tr class="memitem:ab41c761e6c05239ddcef2543a5f06e5e"><td class="memItemLeft" align="right" valign="top"><a id="ab41c761e6c05239ddcef2543a5f06e5e" name="ab41c761e6c05239ddcef2543a5f06e5e"></a>
 char *&#160;</td><td class="memItemRight" valign="bottom"><b>available</b> (bool greedy)</td></tr>
 <tr class="separator:ab41c761e6c05239ddcef2543a5f06e5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dfb5ae507b5846b61f9ddeac735e348"><td class="memItemLeft" align="right" valign="top"><a id="a4dfb5ae507b5846b61f9ddeac735e348" name="a4dfb5ae507b5846b61f9ddeac735e348"></a>
-<a class="el" href="struct_shell_command.html">ShellCommand</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandDefinition</b> (char *command)</td></tr>
-<tr class="separator:a4dfb5ae507b5846b61f9ddeac735e348"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab682766b682489cb027b2f8d75b00b84"><td class="memItemLeft" align="right" valign="top"><a id="ab682766b682489cb027b2f8d75b00b84" name="ab682766b682489cb027b2f8d75b00b84"></a>
+<a class="el" href="struct_shell_command_struct.html">ShellCommandStruct</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandDefinition</b> (char *command)</td></tr>
+<tr class="separator:ab682766b682489cb027b2f8d75b00b84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af506bf000a69294d940f5fc109620888"><td class="memItemLeft" align="right" valign="top"><a id="af506bf000a69294d940f5fc109620888" name="af506bf000a69294d940f5fc109620888"></a>
 CommandHandlerFunc&#160;</td><td class="memItemRight" valign="bottom"><b>findCommandFunction</b> (char *command)</td></tr>
 <tr class="separator:af506bf000a69294d940f5fc109620888"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,8 +131,8 @@ static <a class="el" href="class_shell_controller.html">ShellController</a> *&#1
 <tr class="separator:a95723308a3a9047a390350f3d142e89b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>lib/ShellFactory/src/shell/<a class="el" href="_shell_controller_8h_source.html">ShellController.h</a></li>
-<li>lib/ShellFactory/src/shell/ShellController.cpp</li>
+<li>lib/ArduinoShell/src/shell/<a class="el" href="_shell_controller_8h_source.html">ShellController.h</a></li>
+<li>lib/ArduinoShell/src/shell/ShellController.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

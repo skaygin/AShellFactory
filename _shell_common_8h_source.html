@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Arduino Shell with GitHub: lib/ShellFactory/src/ShellCommon.h Source File</title>
+<title>Arduino Shell with GitHub: lib/ArduinoShell/src/ShellCommon.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_97aefd0d527b934f1d99a682da8fe6a9.html">lib</a></li><li class="navelem"><a class="el" href="dir_a90dc9fb1e1790ee12a5e3e700235600.html">ShellFactory</a></li><li class="navelem"><a class="el" href="dir_c6e5b75e79514bf4642cad2072819bcb.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_97aefd0d527b934f1d99a682da8fe6a9.html">lib</a></li><li class="navelem"><a class="el" href="dir_5da978a9453241bfb802582320cc09bf.html">ArduinoShell</a></li><li class="navelem"><a class="el" href="dir_3ece741020f4dd6f5a3b4944e38874cd.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -110,16 +110,16 @@ $(function() {
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keyword">const</span> int8_t SHELL_RESPONSE_ERR_COMMUNICATION_FAULT = 5;</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">const</span> int8_t SHELL_RESPONSE_ERR_ILLEGAL_OPERATION = 6;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// Implementer Note: Remember to increment count if new response errors are added</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// Note for Developer: Remember to increment count if new response errors are added</span></div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#define SHELL_RESPONSE_ERROR_COUNT 7</span></div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">typedef</span> int8_t (*CommandHandlerFunc)(<a class="code hl_class" href="class_argument_reader.html">ArgumentReader</a> &amp;, Print &amp;);</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="struct_shell_command.html">   47</a></span><span class="keyword">struct </span><a class="code hl_struct" href="struct_shell_command.html">ShellCommand</a></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="struct_shell_command_struct.html">   47</a></span><span class="keyword">struct </span><a class="code hl_struct" href="struct_shell_command_struct.html">ShellCommandStruct</a></div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>{</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> *command;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    PGM_P command;</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    CommandHandlerFunc handler;</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> *helptext;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    PGM_P helptext;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>};</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#define DECLARE_COMMAND_HANDLER(C, HELPSTR)             \</span></div>
@@ -136,17 +136,18 @@ $(function() {
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">    int8_t _shell_handle_##C(ArgumentReader &amp;REQ, Print &amp;RESP)</span></div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#define DECLARE_SHELL_COMMANDS(name) \</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">    const ShellCommand PROGMEM name[]</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">    const ShellCommandStruct name[] PROGMEM</span></div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#define SHELL_COMMAND(C) \</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">    (ShellCommand) { _shell_pstr_cmd_##C, &amp;_shell_handle_##C, _shell_pstr_hlp_##C }</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">    (ShellCommandStruct) { _shell_pstr_cmd_##C, &amp;_shell_handle_##C, _shell_pstr_hlp_##C }</span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="preprocessor">#define END_SHELL_COMMANDS \</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">    (ShellCommand){0, 0, 0},</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#endif </span><span class="comment">//_SHELL_COMMON_H</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment">// this is not to store sizeof array in memory</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#define END_SHELL_COMMANDS \</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="preprocessor">    (ShellCommandStruct){0, 0, 0},</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#endif </span><span class="comment">//_SHELL_COMMON_H</span></div>
 <div class="ttc" id="aclass_argument_reader_html"><div class="ttname"><a href="class_argument_reader.html">ArgumentReader</a></div><div class="ttdoc">Command line parser which reads arguments sequentially. Supports strings, numbers,...</div><div class="ttdef"><b>Definition:</b> ArgumentReader.h:47</div></div>
-<div class="ttc" id="astruct_shell_command_html"><div class="ttname"><a href="struct_shell_command.html">ShellCommand</a></div><div class="ttdef"><b>Definition:</b> ShellCommon.h:48</div></div>
+<div class="ttc" id="astruct_shell_command_struct_html"><div class="ttname"><a href="struct_shell_command_struct.html">ShellCommandStruct</a></div><div class="ttdef"><b>Definition:</b> ShellCommon.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
