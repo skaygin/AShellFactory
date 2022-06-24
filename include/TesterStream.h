@@ -35,7 +35,7 @@ public:
         int n = 0;
         while (n <= 255)
         {
-            unsigned char c = pgm_read_byte(p++);
+            unsigned char c = pgm_read_byte_near(p++);
             if (c == 0)
                 break;
             *(inhead++) = c;

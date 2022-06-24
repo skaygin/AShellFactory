@@ -24,18 +24,6 @@ SOFTWARE.
 #ifndef _SHELL_CONTROLLER_H
 #define _SHELL_CONTROLLER_H
 
-//********************************
-// Shell Factory for Projects based on Arduino compatible boards
-// Version 1.0
-//
-//
-// By Serkan KAYGIN
-//********************************
-
-// VERSION HISTORY:
-// v1.0
-// First open source version
-
 #include <Arduino.h>
 #include <ShellCommon.h>
 #include "ShellFraming.h"
@@ -46,6 +34,15 @@ SOFTWARE.
 
 #if !defined(SHELL_HELP_ALIGN_MAX_COMMAND_LEN)
 #define SHELL_HELP_ALIGN_MAX_COMMAND_LEN 9
+#endif
+
+#if !defined(SHELL_MAX_ENDPOINTS)
+#define SHELL_MAX_ENDPOINTS 4
+#endif
+
+// By default backspace is defined as BS=8 character, make it NUL=0 to disable
+#if !defined(SHELL_BACKSPACE_CHAR)
+#define SHELL_BACKSPACE_CHAR 8
 #endif
 
 const char PSTR_SHELL_RESPONSE_ERR_PREFIX[] PROGMEM = "ERR:";
@@ -59,7 +56,7 @@ const char PSTR_SHELL_RESPONSE_ERR_COMMUNICATION_FAULT[] PROGMEM = "Communicatio
 const char PSTR_SHELL_RESPONSE_ERR_ILLEGAL_OPERATION[] PROGMEM = "Illegal operation";
 
 // THIS ORDER IS IMPORTANT, MUST FOLLOW THE ORDER IN CORRESPONDING DEFINITIONS
-PGM_P const response_error_strings[SHELL_RESPONSE_ERROR_COUNT] PROGMEM =
+const char *const response_error_strings[SHELL_RESPONSE_ERROR_COUNT] PROGMEM =
     {
         PSTR_SHELL_RESPONSE_ERR_CUSTOM_PREFIX,
         PSTR_SHELL_RESPONSE_ERR_BAD_ARGUMENT,
@@ -73,20 +70,20 @@ PGM_P const response_error_strings[SHELL_RESPONSE_ERROR_COUNT] PROGMEM =
 class ShellController : public Print
 {
 private:
-    uint8_t print_mode_; // share this as Print to save RAM
+    uint8_t print_mode_; // share this instance of ShellController as Print for RAM optimization
     ShellFraming *framing_layer_;
     ShellFraming *default_cmd_framing_;
     ShellFraming *pending_framing_;
     ArgumentReader *request_;
-    Stream *requesting_stream_;
-    PGM_P user_command_defs_;
-    PGM_P admin_command_defs_;
-    void *head_node_;
+    Stream *endpoints_[SHELL_MAX_ENDPOINTS];
+    Stream *requesting_endpoint_;
+    PGM_P user_command_start_P_;
+    PGM_P admin_command_start_P_;
     byte request_buf_[SHELL_MAX_REQUEST_LEN + 1]; //+1 for null termination
     byte *request_buf_ptr_;
-    static CommandHandlerFunc getFunctionByCommandDef_(ShellCommand *);
-    static ShellCommand *findCommandDef_(PGM_P pgmp, char *cmd);
-    static void printHelp_(Print &out, PGM_P command_defs, const char *cmd);
+    static ShellCommandStruct *findCommandStruct_P_(PGM_P command_start_P, char *cmd);
+    static CommandHandlerFunc getFunctionByCommandStruct_P_(ShellCommandStruct *);
+    static void printHelp_(Print &out, PGM_P command_start_P, const char *cmd);
     void printError_(Print &out, int8_t errorcode);
     void endExecute_();
     void beginResponse_(Print *out);
@@ -95,8 +92,8 @@ private:
 public:
     static ShellController *context();
     ShellController();
-    void begin(const ShellCommand user_commands[], char prompt = '>');
-    void setAdminCommands(const ShellCommand admin_commands[]);
+    void begin(const ShellCommandStruct user_commands[], const __FlashStringHelper *prompt = 0);
+    void setAdminCommands(const ShellCommandStruct admin_commands[]);
     void addEndpoint(Stream &stream);
     void removeEndpoint(Stream &stream);
     Stream *getRequestingEndpoint();
@@ -108,14 +105,12 @@ public:
     void exec(const __FlashStringHelper *command_line, Print &out);
 
     char *available(bool greedy);
-    ShellCommand *findCommandDefinition(char *command);
+    ShellCommandStruct *findCommandDefinition(char *command);
     CommandHandlerFunc findCommandFunction(char *command);
     void setFraming(ShellFraming *framing);
     virtual size_t write(uint8_t c);
 };
 
 extern ShellController Shell;
-
-// DECLARE_COMMAND_HANDLER(HELP, "Provides Help information for commands. [-a] [<cmd>]");
 
 #endif //_SHELL_CONTROLLER_H

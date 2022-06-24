@@ -21,16 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _SHELL_H
-#define _SHELL_H
+#ifndef _SHELL_CMD_FREEMEM_H_
+#define _SHELL_CMD_FREEMEM_H_
+#include <ShellCommon.h>
 
-// TODO:
-// - native print and stream
-// - Examples
-// - Unit tests to be reviewed
+DECLARE_COMMAND_HANDLER(FREEMEM, "Displays free memory.");
 
-#include "ShellCore.h"
-#include "shell/ShellCmdHELP.h"
-#include "shell/ShellCmdFREEMEM.h"
-#include "shell/ShellCmdRESET.h"
-#endif //_SHELL_H
+#endif //_SHELL_CMD_FREEMEM_H_

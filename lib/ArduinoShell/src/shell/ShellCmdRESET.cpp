@@ -21,16 +21,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _SHELL_H
-#define _SHELL_H
+#include "ShellCmdRESET.h"
+#ifdef __AVR__
+#include <avr/wdt.h>
+#endif
 
-// TODO:
-// - native print and stream
-// - Examples
-// - Unit tests to be reviewed
+IMPLEMENT_COMMAND_HANDLER(RESET, request, response)
+{
+#ifdef __AVR__
 
-#include "ShellCore.h"
-#include "shell/ShellCmdHELP.h"
-#include "shell/ShellCmdFREEMEM.h"
-#include "shell/ShellCmdRESET.h"
-#endif //_SHELL_H
+    wdt_disable();
+    wdt_enable(WDTO_15MS);
+    delay(100);
+    wdt_disable();
+    response.println(F("WDT reset failed."));
+    delay(100);
+    void (*swreset)(void) = 0;
+    swreset();
+#endif
+    return SHELL_RESPONSE_ERR_ILLEGAL_OPERATION; // should never come here
+}

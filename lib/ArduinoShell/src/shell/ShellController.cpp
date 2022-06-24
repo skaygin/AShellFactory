@@ -39,7 +39,7 @@ const char PSTR_SHELL_RESPONSE_ERR_COMMAND_TOO_LONG[] PROGMEM = "Command too lon
 const char PSTR_SHELL_RESPONSE_ERR_BAD_FRAME[] PROGMEM = "Bad frame";
 
 // THIS ORDER IS IMPORTANT, MUST FOLLOW THE ORDER IN CORRESPONDING DEFINITIONS
-PGM_P const system_error_strings[] PROGMEM =
+const char *const system_error_strings[SHELL_RESPONSE_SYSTEM_ERROR_COUNT] PROGMEM =
     {
         PSTR_SHELL_RESPONSE_ERR_UNKNOWN_ERROR,
         PSTR_SHELL_RESPONSE_ERR_BAD_COMMAND,
@@ -55,13 +55,21 @@ const uint8_t PRINTMODE_REQUESTING = 1; // Forwarded to the request buffer
 const uint8_t PRINTMODE_RESPONDING = 2; // Forwarded to requesting stream (CLI)
 // Note: doing this using inner classes wasted 32 byte RAM
 
+const char NUL = 0;
+const char STX = 2;
+const char ETX = 3;
+const char BS = 8;
+const char CR = 13;
+const char LF = 10;
+const char DEL = 0x7F;
+
 class DefaultFraming : public ShellFraming
 {
 private:
-  char prompt_;
+  const __FlashStringHelper *prompt_;
 
 public:
-  void begin(char prompt)
+  void begin(const __FlashStringHelper *prompt)
   {
     prompt_ = prompt;
   }
@@ -69,31 +77,18 @@ public:
   {
     out->println();
     if (prompt_)
-      out->write(prompt_);
+      out->print(prompt_);
   }
   virtual int8_t receive(Print *in, char c)
   {
-    if (c == 13)
+    // Supports both newlines of platformio (CRLF) and putty(CR)
+    if (c == CR)
       return 1;
-    if (c != 10)
+    if (c != LF) // LF ignored
     {
       in->write(c & 0x7f);
     }
     return 0;
-  }
-};
-
-//******************************Linked list node for registered endpoints (CLIs) ******
-class EndpointNode
-{
-private:
-public:
-  Stream *stream; // endpoint, console
-  EndpointNode *next;
-  EndpointNode(Stream *endpoint_stream)
-  {
-    stream = endpoint_stream;
-    next = 0;
   }
 };
 
@@ -108,26 +103,26 @@ ShellController *ShellController::context()
 
 ShellController::ShellController()
 {
-  user_command_defs_ = 0;
-  head_node_ = 0;
+  user_command_start_P_ = 0;
+  admin_command_start_P_ = 0;
   request_ = new ArgumentReader();
   default_cmd_framing_ = new DefaultFraming();
   framing_layer_ = default_cmd_framing_;
   pending_framing_ = 0;
   print_mode_ = PRINTMODE_IGNORE;
+  memset(endpoints_, 0, sizeof(endpoints_));
 }
 
-void ShellController::begin(const ShellCommand user_commands[], char prompt)
+void ShellController::begin(const ShellCommandStruct user_commands[], const __FlashStringHelper *prompt)
 {
   ((DefaultFraming *)default_cmd_framing_)->begin(prompt);
-  user_command_defs_ = (PGM_P)user_commands;
-  admin_command_defs_ = 0;
+  user_command_start_P_ = (PGM_P)user_commands;
   request_buf_ptr_ = &request_buf_[0];
 }
 
-void ShellController::setAdminCommands(const ShellCommand admin_commands[])
+void ShellController::setAdminCommands(const ShellCommandStruct admin_commands[])
 {
-  admin_command_defs_ = (PGM_P)admin_commands;
+  admin_command_start_P_ = (PGM_P)admin_commands;
 }
 
 void ShellController::setFraming(ShellFraming *framing)
@@ -137,46 +132,38 @@ void ShellController::setFraming(ShellFraming *framing)
 
 void ShellController::addEndpoint(Stream &stream)
 {
-  EndpointNode *newnode = new EndpointNode(&stream);
-  if (!head_node_)
+  for (int8_t i = 0; i < SHELL_MAX_ENDPOINTS; i++)
   {
-    head_node_ = newnode;
-    //_active_stream = &stream; // allows writes in setup() to be forwarded to the firstly registered console
-  }
-  else
-  {
-    EndpointNode *n = (EndpointNode *)head_node_;
-    while (n->next)
-      n = n->next;
-    n->next = newnode;
+    Stream *s = endpoints_[i];
+    if (s == &stream) // prevent duplicates
+      break;
+    if (!s) // find first empty cell and insert
+    {
+      endpoints_[i] = &stream;
+      break;
+    }
   }
 }
 
 void ShellController::removeEndpoint(Stream &stream)
 {
-  EndpointNode *n = (EndpointNode *)head_node_;
-  EndpointNode *prev = 0;
-  while (n)
+  for (int8_t i = 0; i < SHELL_MAX_ENDPOINTS; i++)
   {
-    if (n->stream == &stream)
+    Stream *s = endpoints_[i];
+    if (s == &stream)
     {
-      if (prev)
-        prev->next = n->next;
-      else
-        head_node_ = n->next;
-      n->next = 0;
-      // if (_active_stream == &stream)
-      //   _active_stream = _head_node ? ((StreamNode *)_head_node)->stream : 0;
-      return;
+      // found at index i, shift all to left and clear final cell
+      for (int8_t j = i; j < SHELL_MAX_ENDPOINTS - 1; j++)
+        endpoints_[j] = endpoints_[j + 1];
+      endpoints_[SHELL_MAX_ENDPOINTS - 1] = 0;
+      break;
     }
-    prev = n;
-    n = n->next;
   }
 }
 
 Stream *ShellController::getRequestingEndpoint()
 {
-  return requesting_stream_;
+  return requesting_endpoint_;
 }
 
 size_t ShellController::write(uint8_t c)
@@ -188,9 +175,13 @@ size_t ShellController::write(uint8_t c)
     {
       request_buf_ptr_ = &request_buf_[0];
     }
+    else if (c == SHELL_BACKSPACE_CHAR)
+    {
+      if (request_buf_ptr_ > bufstart)
+        request_buf_ptr_--;
+    }
     else
     {
-      // if (((int)request_buf_ptr_ - (int)bufstart) < SHELL_MAX_REQUEST_LEN)
       if ((request_buf_ptr_ - bufstart) < SHELL_MAX_REQUEST_LEN)
         *request_buf_ptr_ = c;
       request_buf_ptr_++; // increase cmdptr but do not alter buffer, this allows backspace
@@ -198,35 +189,35 @@ size_t ShellController::write(uint8_t c)
   }
   else if (print_mode_ == PRINTMODE_RESPONDING)
   {
-    if (requesting_stream_)
-      framing_layer_->send(requesting_stream_, c);
+    if (requesting_endpoint_)
+      framing_layer_->send(requesting_endpoint_, c);
   }
   return 1;
 }
 
 // assumes that bufptr point to the start char of command, spaces are converted to null, cmdptr points to the parameters
-ShellCommand *ShellController::findCommandDef_(PGM_P pgmp, char *chptr)
+ShellCommandStruct *ShellController::findCommandStruct_P_(PGM_P command_start_P, char *chptr)
 {
-  PGM_P cmd = pgmp;
-  while (cmd)
+  PGM_P cmd = command_start_P;
+  while (cmd) // admin commands can be null
   {
-    PGM_P cmdp = (PGM_P)pgm_read_ptr(cmd);
-    if (!cmdp)
+    PGM_P cmdp = (PGM_P)pgm_read_ptr_near(cmd);
+    if (!cmdp) // check if final command
       break;
     if (strcasecmp_P(chptr, cmdp) == 0)
-      return (ShellCommand *)cmd;
-    cmd += sizeof(ShellCommand);
+      return (ShellCommandStruct *)cmd;
+    cmd += sizeof(ShellCommandStruct);
   }
   return 0;
 }
 
-void ShellController::printHelp_(Print &out, PGM_P command_defs, const char *cmd)
+void ShellController::printHelp_(Print &out, PGM_P command_start_P, const char *cmd)
 {
   // cmd == 0 means ALL, help for SPECIFIC command otherwise
-  if (command_defs) // admin commands might not be set
+  if (command_start_P) // admin commands might not be set
     while (true)
     {
-      PGM_P cmdp = (PGM_P)pgm_read_ptr(command_defs);
+      PGM_P cmdp = (PGM_P)pgm_read_ptr_near(command_start_P);
       if (!cmdp)
         break;
       // traverses each command definition
@@ -243,12 +234,12 @@ void ShellController::printHelp_(Print &out, PGM_P command_defs, const char *cmd
           out.write(' ');
         }
         // Both ALL and SPECIFIC
-        PGM_P hlptxtp = (PGM_P)pgm_read_ptr(command_defs + sizeof(PGM_P) + sizeof(CommandHandlerFunc));
+        PGM_P hlptxtp = (PGM_P)pgm_read_ptr_near(command_start_P + sizeof(PGM_P) + sizeof(CommandHandlerFunc));
         // write until dot (included)
         char c;
         do
         {
-          c = pgm_read_byte(hlptxtp);
+          c = pgm_read_byte_near(hlptxtp);
           if (c == 0)
             break;
           out.write(c);
@@ -262,7 +253,7 @@ void ShellController::printHelp_(Print &out, PGM_P command_defs, const char *cmd
           return;                  // SPECIFIC returns after found
         }
       }
-      command_defs += sizeof(ShellCommand);
+      command_start_P += sizeof(ShellCommandStruct);
     }
   // ALL
   if (cmd)
@@ -273,7 +264,7 @@ void ShellController::printHelp_(Print &out, PGM_P command_defs, const char *cmd
 
 void ShellController::printHelp(Print &out, bool admin, char *cmd)
 {
-  printHelp_(out, admin ? admin_command_defs_ : user_command_defs_, cmd);
+  printHelp_(out, admin ? admin_command_start_P_ : user_command_start_P_, cmd);
 }
 
 void ShellController::printError_(Print &out, int8_t errorcode)
@@ -290,19 +281,13 @@ void ShellController::printError_(Print &out, int8_t errorcode)
     index = 127 - errorcode;
     if (index >= SHELL_RESPONSE_SYSTEM_ERROR_COUNT)
       index = 127 - SHELL_RESPONSE_ERR_UNKNOWN_ERROR;
-    out.print(F_P(pgm_read_ptr(&(system_error_strings[index]))));
+    out.print(F_P(pgm_read_ptr_near(&(system_error_strings[index]))));
     return;
   }
-  out.print(F_P(pgm_read_ptr(&(response_error_strings[index]))));
+  out.print(F_P(pgm_read_ptr_near(&(response_error_strings[index]))));
   if (errorcode < 0)
     out.print(errorcode);
 }
-
-#define NUL 0
-#define STX 2
-#define ETX 3
-#define CR 13
-#define LF 10
 
 void ShellController::beginResponse_(Print *out)
 {
@@ -317,9 +302,9 @@ void ShellController::endResponse_(Print *out, int8_t error_code)
     printError_(*out, error_code);
   request_buf_ptr_ = &request_buf_[0];
   framing_layer_->endSend(out); //&_response_out
-  if (requesting_stream_)
-    requesting_stream_->flush(); // flush after command is executed, useful for buffered streams
-  requesting_stream_ = 0;
+  if (requesting_endpoint_)
+    requesting_endpoint_->flush(); // flush after command is executed, useful for buffered streams
+  requesting_endpoint_ = 0;
   context_ = 0;
   print_mode_ = PRINTMODE_IGNORE;
   if (pending_framing_)
@@ -329,23 +314,23 @@ void ShellController::endResponse_(Print *out, int8_t error_code)
   }
 }
 
-ShellCommand *ShellController::findCommandDefinition(char *command)
+ShellCommandStruct *ShellController::findCommandDefinition(char *command)
 {
-  ShellCommand *cmddef = findCommandDef_((PGM_P)user_command_defs_, command);
+  ShellCommandStruct *cmddef = findCommandStruct_P_((PGM_P)user_command_start_P_, command);
   if (!cmddef)
-    cmddef = findCommandDef_((PGM_P)admin_command_defs_, command);
+    cmddef = findCommandStruct_P_((PGM_P)admin_command_start_P_, command);
   return cmddef;
 }
 
 CommandHandlerFunc ShellController::findCommandFunction(char *command)
 {
-  ShellCommand *cmddef = findCommandDefinition(command);
-  return cmddef ? getFunctionByCommandDef_(cmddef) : 0;
+  ShellCommandStruct *cmddef = findCommandDefinition(command);
+  return cmddef ? getFunctionByCommandStruct_P_(cmddef) : 0;
 }
 
-CommandHandlerFunc ShellController::getFunctionByCommandDef_(ShellCommand *cmd)
+CommandHandlerFunc ShellController::getFunctionByCommandStruct_P_(ShellCommandStruct *cmd)
 {
-  return (CommandHandlerFunc)((PGM_P)pgm_read_ptr(&(cmd->handler)));
+  return (CommandHandlerFunc)((PGM_P)pgm_read_ptr_near(&(cmd->handler)));
 }
 
 int8_t ShellController::call(byte *command_line, Print &response)
@@ -354,12 +339,12 @@ int8_t ShellController::call(byte *command_line, Print &response)
   request_->begin(command_line);
   request_->readString(&cmdstart, true);
   // _request_buf_ptr points the first parameter (or null)
-  ShellCommand *cmd = findCommandDefinition(cmdstart);
+  ShellCommandStruct *cmd = findCommandDefinition(cmdstart);
   if (!cmd)
     return SHELL_RESPONSE_ERR_BAD_COMMAND;
   else
   {
-    CommandHandlerFunc func = getFunctionByCommandDef_(cmd);
+    CommandHandlerFunc func = getFunctionByCommandStruct_P_(cmd);
     int8_t ret = func(*request_, response);
     if (ret >= SHELL_RESPONSE_ERROR_COUNT)
       ret = SHELL_RESPONSE_ERR_UNKNOWN_ERROR;
@@ -385,22 +370,23 @@ char *ShellController::available(bool greedy)
 {
   byte *bufstart = &request_buf_[0];
   print_mode_ = PRINTMODE_REQUESTING;
-  EndpointNode *n = (EndpointNode *)head_node_;
-  while (n)
+  for (int8_t i = 0; i < SHELL_MAX_ENDPOINTS; i++)
   {
-    Stream *s = n->stream;
+    Stream *s = endpoints_[i];
+    if (!s) // optimize for single endpoint (as endpoints are aligned to left, no need to iterate further)
+      break;
     while (s->available())
     {
-      int8_t rcvres = framing_layer_->receive(this, s->read());
+      char c = s->read();
+      int8_t rcvres = framing_layer_->receive(this, c);
       if (rcvres)
       {
-        requesting_stream_ = s;
+        requesting_endpoint_ = s;
         int8_t errcode = 0;
         if (rcvres < 0)
         {
           errcode = SHELL_RESPONSE_ERR_BAD_FRAME;
         }
-        // else if (((int)request_buf_ptr_ - (int)bufstart) > SHELL_MAX_REQUEST_LEN)
         else if ((request_buf_ptr_ - bufstart) > SHELL_MAX_REQUEST_LEN)
         {
           errcode = SHELL_RESPONSE_ERR_COMMAND_TOO_LONG;
@@ -420,7 +406,6 @@ char *ShellController::available(bool greedy)
       if (!greedy)
         break;
     }
-    n = n->next;
   }
   print_mode_ = PRINTMODE_IGNORE;
   return 0;
@@ -436,31 +421,3 @@ void ShellController::tick(bool greedy)
 }
 
 ShellController Shell; // create object
-
-// *************** BUILT-IN COMMANDS *************************
-
-/*
-IMPLEMENT_COMMAND_HANDLER(HELP, request, response)
-{
-  char *cmd;
-  bool isadmin = false;
-  if (!request.readString(&cmd))
-  {
-    cmd = 0;
-  }
-  else
-  {
-    if (strcasecmp_P(cmd, PSTR("-A")) == 0)
-    {
-      isadmin = true;
-      if (!request.readString(&cmd))
-      {
-        cmd = 0;
-      }
-    }
-  }
-  if (context_)
-    context_->printHelp(response, isadmin, cmd);
-  return 0;
-}
-*/

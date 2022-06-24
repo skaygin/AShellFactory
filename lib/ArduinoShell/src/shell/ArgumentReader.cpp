@@ -150,7 +150,7 @@ int8_t ArgumentReader::readEnum(uint8_t *arg, PGM_P options, char delimiter)
   PGM_P start = options;
   PGM_P end = start;
   uint8_t index = 0;
-  char c = pgm_read_byte(end);
+  char c = pgm_read_byte_near(end);
   while (c)
   {
     if (c == delimiter)
@@ -164,7 +164,7 @@ int8_t ArgumentReader::readEnum(uint8_t *arg, PGM_P options, char delimiter)
       start = end + 1;
       index++;
     }
-    c = pgm_read_byte(++end);
+    c = pgm_read_byte_near(++end);
   }
   if (strcasecmp_P(enumstr, start))
     return -len;
@@ -176,14 +176,14 @@ void ArgumentReader::printEnum(Print &output, uint8_t value, PGM_P options, char
 {
   PGM_P end = options;
   uint8_t index = 0;
-  char c = pgm_read_byte(end);
+  char c = pgm_read_byte_near(end);
   while (c)
   {
     if (c == delimiter)
       index++;
     else if (index == value)
       output.write(c);
-    c = pgm_read_byte(++end);
+    c = pgm_read_byte_near(++end);
   }
 }
 

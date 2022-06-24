@@ -280,11 +280,13 @@ int main(int argc, char **argv)
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
     // delay(2000);
+    Serial.begin(115200);
     while (!Serial)
         ;
-    // Serial.begin(115200);
-    Shell.begin(user_commands, '~');
+    Shell.begin(user_commands, F("~"));
+    // Shell.addEndpoint(tester2);
     Shell.addEndpoint(tester);
+    // Shell.removeEndpoint(tester2);
     Shell.addEndpoint(tester2);
     UNITY_BEGIN();
     RUN_TEST(test_ver_command);

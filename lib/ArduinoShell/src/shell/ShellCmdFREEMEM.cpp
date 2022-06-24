@@ -21,16 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _SHELL_H
-#define _SHELL_H
+#include "ShellCmdFREEMEM.h"
 
-// TODO:
-// - native print and stream
-// - Examples
-// - Unit tests to be reviewed
-
-#include "ShellCore.h"
-#include "shell/ShellCmdHELP.h"
-#include "shell/ShellCmdFREEMEM.h"
-#include "shell/ShellCmdRESET.h"
-#endif //_SHELL_H
+IMPLEMENT_COMMAND_HANDLER(FREEMEM, request, response)
+{
+#ifdef __AVR__
+    extern int __heap_start, *__brkval;
+    uint16_t ram = (uint16_t)(RAMEND - RAMSTART + 1);
+    response.print((int)&ram - (__brkval == 0 ? (int)&__heap_start : (int)__brkval));
+    response.write('/');
+    response.print(ram);
+    return 0;
+#else
+    return SHELL_RESPONSE_ERR_ILLEGAL_OPERATION;
+#endif
+}

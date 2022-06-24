@@ -102,12 +102,12 @@ void test_read_line_wrong_order(void)
 void test_shell(void)
 {
     // TEST_ASSERT_EQUAL_INT8(0, Shell.call("ver", testout));
-    // Shell.run(F("VER"), testout);
+    // Shell.exec(F("VER"), testout);
 }
 
 int main(int argc, char **argv)
 {
-    Shell.begin(user_commands, '~');
+    Shell.begin(user_commands, F("~"));
     // Shell.addEndpoint(tester);
     UNITY_BEGIN();
     RUN_TEST(test_read_line);

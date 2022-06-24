@@ -39,16 +39,16 @@ const int8_t SHELL_RESPONSE_ERR_IO_ERROR = 4;
 const int8_t SHELL_RESPONSE_ERR_COMMUNICATION_FAULT = 5;
 const int8_t SHELL_RESPONSE_ERR_ILLEGAL_OPERATION = 6;
 
-// Implementer Note: Remember to increment count if new response errors are added
+// Note for Developer: Remember to increment count if new response errors are added
 #define SHELL_RESPONSE_ERROR_COUNT 7
 
 typedef int8_t (*CommandHandlerFunc)(ArgumentReader &, Print &);
 
-struct ShellCommand
+struct ShellCommandStruct
 {
-    const char *command;
+    PGM_P command;
     CommandHandlerFunc handler;
-    const char *helptext;
+    PGM_P helptext;
 };
 
 #define DECLARE_COMMAND_HANDLER(C, HELPSTR)             \
@@ -65,12 +65,13 @@ struct ShellCommand
     int8_t _shell_handle_##C(ArgumentReader &REQ, Print &RESP)
 
 #define DECLARE_SHELL_COMMANDS(name) \
-    const ShellCommand PROGMEM name[]
+    const ShellCommandStruct name[] PROGMEM
 
 #define SHELL_COMMAND(C) \
-    (ShellCommand) { _shell_pstr_cmd_##C, &_shell_handle_##C, _shell_pstr_hlp_##C }
+    (ShellCommandStruct) { _shell_pstr_cmd_##C, &_shell_handle_##C, _shell_pstr_hlp_##C }
 
+// this is not to store sizeof array in memory
 #define END_SHELL_COMMANDS \
-    (ShellCommand){0, 0, 0},
+    (ShellCommandStruct){0, 0, 0},
 
 #endif //_SHELL_COMMON_H

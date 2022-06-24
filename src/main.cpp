@@ -21,9 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "Arduino.h"
+#include <Arduino.h>
 #include <Shell.h>
-#include <ShellCmdRepository.h>
+#include <ShellCmd.h>
 
 COMMAND_HANDLER(VER, request, response, "Displays firmware version.")
 {
@@ -37,13 +37,21 @@ DECLARE_SHELL_COMMANDS(user_commands){
     SHELL_COMMAND(APIN),
     SHELL_COMMAND(EEREAD),
     SHELL_COMMAND(EEWRITE),
+    SHELL_COMMAND(FREEMEM),
+    SHELL_COMMAND(RESET),
     SHELL_COMMAND(HELP),
     END_SHELL_COMMANDS};
 
 void setup()
 {
     Serial.begin(9600);
-    Shell.begin(user_commands);
+#ifndef ENV_NATIVE
+    while (!Serial)
+        ; // wait for serial port to connect. Needed for native USB
+#endif
+    Shell.begin(user_commands, F(">>"));
+    Shell.addEndpoint(Serial);
+    Shell.removeEndpoint(Serial);
     Shell.addEndpoint(Serial);
     Shell.exec(F("VER"), Serial);
 }
@@ -98,7 +106,7 @@ int main()
     putchar(13);
     putchar(10);
     // printf("hello world\r\n");
-    Shell.begin(user_commands);
+    Shell.begin(user_commands, F(">>"));
     //   Shell.addEndpoint(stdout);
     Shell.exec(F("VER"), stdprint);
     printf("exiting\r\n");
