@@ -22,8 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <Arduino.h>
+
 #include <Shell.h>
 #include <ShellCmd.h>
+
+DECLARE_COMMAND_HANDLER(LOGIN, "Logs in and enables user commands.");
+DECLARE_COMMAND_HANDLER(LOGOUT, "Logs out and disables user commands.");
 
 COMMAND_HANDLER(VER, request, response, "Displays firmware version.")
 {
@@ -35,12 +39,39 @@ DECLARE_SHELL_COMMANDS(user_commands){
     SHELL_COMMAND(VER),
     SHELL_COMMAND(PIN),
     SHELL_COMMAND(APIN),
-    SHELL_COMMAND(EEREAD),
-    SHELL_COMMAND(EEWRITE),
+    // SHELL_COMMAND(EEREAD),
+    // SHELL_COMMAND(EEWRITE),
     SHELL_COMMAND(FREEMEM),
     SHELL_COMMAND(RESET),
+    SHELL_COMMAND(LOGOUT),
     SHELL_COMMAND(HELP),
     END_SHELL_COMMANDS};
+
+DECLARE_SHELL_COMMANDS(login_commands){
+    SHELL_COMMAND(LOGIN),
+    SHELL_COMMAND(HELP),
+    END_SHELL_COMMANDS};
+
+DECLARE_SHELL_COMMANDS(admin_commands){
+    SHELL_COMMAND(EEREAD),
+    SHELL_COMMAND(EEWRITE),
+    END_SHELL_COMMANDS};
+
+IMPLEMENT_COMMAND_HANDLER(LOGIN, request, response)
+{
+    Shell.setUserCommands(user_commands);
+    Shell.setAdminCommands(admin_commands);
+    response.print(F("User commands are available."));
+    return 0;
+}
+
+IMPLEMENT_COMMAND_HANDLER(LOGOUT, request, response)
+{
+    Shell.setUserCommands(login_commands);
+    Shell.setAdminCommands(0);
+    response.print(F("Logged out."));
+    return 0;
+}
 
 void setup()
 {
@@ -49,7 +80,7 @@ void setup()
     while (!Serial)
         ; // wait for serial port to connect. Needed for native USB
 #endif
-    Shell.begin(user_commands, F(">>"));
+    Shell.begin(login_commands, F(">>"));
     Shell.addEndpoint(Serial);
     Shell.removeEndpoint(Serial);
     Shell.addEndpoint(Serial);
@@ -61,56 +92,9 @@ void loop()
     Shell.tick();
 }
 
-#ifdef ENV_NATIVE
-#include <stdio.h>
-class StdioPrint : public Print
-{
-public:
-    virtual size_t write(uint8_t c)
-    {
-        putchar(c);
-        return 1;
-    }
-
-    /* default implementation: may be overridden */
-    size_t write(const uint8_t *buffer, size_t size)
-    {
-        size_t n = 0;
-        while (size--)
-        {
-            if (write(*buffer++))
-                n++;
-            else
-                break;
-        }
-        return n;
-    }
-};
-
-char *cmdptr_;
-
-void try_charptr(const char *cmdline)
-{
-    cmdptr_ = (char *)cmdline;
-}
-
-StdioPrint stdprint;
-
 int main()
 {
-    try_charptr("hello world");
-    stdprint.write('e');
-    stdprint.write((uint8_t *)"abc", 3);
-    putchar('h');
-    // stdprint.print("xyz"); //this doesn't work because Print is from ArduinoFake and functions are all zero
-    putchar(13);
-    putchar(10);
-    // printf("hello world\r\n");
-    Shell.begin(user_commands, F(">>"));
-    //   Shell.addEndpoint(stdout);
-    Shell.exec(F("VER"), stdprint);
-    printf("exiting\r\n");
+    setup();
+    loop();
     return 0;
 }
-
-#endif

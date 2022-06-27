@@ -93,6 +93,7 @@ public:
     static ShellController *context();
     ShellController();
     void begin(const ShellCommandStruct user_commands[], const __FlashStringHelper *prompt = 0);
+    void setUserCommands(const ShellCommandStruct user_commands[]);
     void setAdminCommands(const ShellCommandStruct admin_commands[]);
     void addEndpoint(Stream &stream);
     void removeEndpoint(Stream &stream);

@@ -25,10 +25,20 @@ SOFTWARE.
 #define _SHELL_H
 
 // TODO:
-// - native print and stream
-// - Examples
 // - Unit tests to be reviewed
-
+// - Python terminal for acceptance tests
+// - Otomatically generate deployments for Arduino and PlatformIO
+/*
+- Examples
+    - Basic : all built-in commands with admin, plus LED command
+    - Tiny : no help just a single command
+    - DynamicCommands : login
+    - MultiEndpoints : both serial and software serial
+    - AdvancedMultiShell : two endpoint to distinct shells
+    - Bluetooth : Two endpoints, one bluetooth, other serial, forwards AT commands
+    - Telnet : Needs ethernet, both serial and telnet works
+    - Advanced : Shell Framing Layer
+*/
 #include "ShellCore.h"
 #include "shell/ShellCmdHELP.h"
 #include "shell/ShellCmdFREEMEM.h"

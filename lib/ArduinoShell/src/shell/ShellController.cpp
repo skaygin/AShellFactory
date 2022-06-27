@@ -116,8 +116,13 @@ ShellController::ShellController()
 void ShellController::begin(const ShellCommandStruct user_commands[], const __FlashStringHelper *prompt)
 {
   ((DefaultFraming *)default_cmd_framing_)->begin(prompt);
-  user_command_start_P_ = (PGM_P)user_commands;
   request_buf_ptr_ = &request_buf_[0];
+  setUserCommands(user_commands);
+}
+
+void ShellController::setUserCommands(const ShellCommandStruct user_commands[])
+{
+  user_command_start_P_ = (PGM_P)user_commands;
 }
 
 void ShellController::setAdminCommands(const ShellCommandStruct admin_commands[])

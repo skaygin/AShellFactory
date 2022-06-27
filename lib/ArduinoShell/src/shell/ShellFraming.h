@@ -46,12 +46,8 @@ class ShellFraming
 {
 public:
     // REQUEST
-    virtual void resetReceive() {}            // clear buffers, reset checksum
-    virtual int8_t receive(Print *in, char c) // handle receive, return frame status
-    {
-        // default implementation receives nothing
-        return SHELL_FRAME_NOT_RECEIVED;
-    }
+    virtual void resetReceive() {} // clear buffers, reset checksum
+    virtual int8_t receive(Print *in, char c) = 0;
     // RESPONSE
     virtual void beginSend(Print *out) {} // send frame header
     virtual void send(Print *out, char c) // send data, updates checksum
