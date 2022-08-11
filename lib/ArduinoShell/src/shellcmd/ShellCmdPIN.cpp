@@ -26,7 +26,7 @@ SOFTWARE.
 IMPLEMENT_COMMAND_HANDLER(PIN, request, response)
 {
     int16_t pin;
-    if (!request.readInt(&pin))
+    if (!request.readInt16(&pin))
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     uint8_t value;
     PGM_P options = PSTR("LOW|HIGH|INPUT|OUTPUT|PULLUP");
@@ -51,10 +51,10 @@ IMPLEMENT_COMMAND_HANDLER(PIN, request, response)
 IMPLEMENT_COMMAND_HANDLER(APIN, request, response)
 {
     int16_t pin;
-    if (!request.readInt(&pin))
+    if (!request.readInt16(&pin))
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     int16_t value;
-    if (!request.readInt(&value))
+    if (!request.readInt16(&value))
         value = analogRead(pin);
     else
         analogWrite(pin, value);

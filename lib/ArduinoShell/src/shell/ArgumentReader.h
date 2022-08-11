@@ -50,14 +50,20 @@ private:
     char separator_;
 
 public:
-    static bool atol(const char *str, long *result);
+    static bool strToUInt32(const char *str, uint32_t *result, int base = DEC, uint8_t fraction_places = 0);
+    static bool parseUInt32(const char *str, uint32_t *result);
+    static bool parseInt32(const char *str, int32_t *result);
+    static bool parseDecimal32(const char *str, int32_t *result, uint8_t decimal_places);
     ArgumentReader(char separator = ' ');
     void begin(byte *cmdlinebuf);
-    int8_t readLong(int32_t *arg, int32_t min = (long)0x80000000, int32_t max = 0x7fffffff);
-    int8_t readInt(int16_t *arg, int16_t min = (int)0x8000, int16_t max = 0x7fff);
+    int8_t readDecimal32(int32_t *arg, uint8_t decimal_places, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
+    int8_t readUInt32(uint32_t *arg, uint32_t min = 0, uint32_t max = 0xffffffff);
+    int8_t readInt32(int32_t *arg, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
+    int8_t readInt16(int16_t *arg, int16_t min = (int16_t)0x8000, int16_t max = 0x7fff);
     int8_t readEnum(uint8_t *arg, PGM_P options, char delimiter = '|');
     int16_t readString(char **arg, bool uppercase, char separator);
     int16_t readString(char **arg, bool uppercase = false);
+    int8_t readHex(uint32_t *arg, uint32_t min = 0, uint32_t max = 0xffffffff);
     int16_t readToEnd(char **arg, bool uppercase = false);
     static void printEnum(Print &output, uint8_t value, PGM_P options, char delimiter = '|');
     char *peek();

@@ -26,6 +26,33 @@ SOFTWARE.
 #include <Shell.h>
 #include <ShellCmd.h>
 
+COMMAND_HANDLER(INT, request, response, "Conversion for int. <value>")
+{
+    int32_t v;
+    if (request.readInt32(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(UINT, request, response, "Conversion for uint. <value>")
+{
+    uint32_t v;
+    if (request.readUInt32(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(DEC, request, response, "Conversion for decimal. <value>")
+{
+    int32_t v;
+    if (request.readDecimal32(&v, 2) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
 DECLARE_COMMAND_HANDLER(LOGIN, "Logs in and enables user commands.");
 DECLARE_COMMAND_HANDLER(LOGOUT, "Logs out and disables user commands.");
 
@@ -39,6 +66,9 @@ DECLARE_SHELL_COMMANDS(user_commands){
     SHELL_COMMAND(VER),
     SHELL_COMMAND(PIN),
     SHELL_COMMAND(APIN),
+    SHELL_COMMAND(INT),
+    SHELL_COMMAND(UINT),
+    SHELL_COMMAND(DEC),
     // SHELL_COMMAND(EEREAD),
     // SHELL_COMMAND(EEWRITE),
     SHELL_COMMAND(FREEMEM),
@@ -92,9 +122,12 @@ void loop()
     Shell.tick();
 }
 
+#ifdef ENV_NATIVE
+// in native mode, debug the program with single loop
 int main()
 {
     setup();
     loop();
     return 0;
 }
+#endif
