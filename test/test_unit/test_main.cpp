@@ -132,6 +132,9 @@ void test_fraction_conversion(void)
     TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("", &val, DEC, 2));
     TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(".", &val, DEC, 2));
     TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("12.3x", &val, DEC, 1));
+    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("12.3 ", &val, DEC, 1));
     //  original value does not change when false
     TEST_ASSERT_EQUAL_UINT32(999, val);
 
@@ -145,6 +148,8 @@ void test_fraction_conversion(void)
     TEST_ASSERT_EQUAL_UINT32(123, val);
     TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.34", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(1234, val);
+    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.39", &val, DEC, 1));
+    TEST_ASSERT_EQUAL_UINT32(123, val);
     TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("11.11", &val, BIN, 2));
     TEST_ASSERT_EQUAL_UINT32(0b1111, val);
     TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("AB.CD", &val, HEX, 2));
@@ -261,6 +266,12 @@ void test_parse_decimal32(void)
     TEST_ASSERT_EQUAL_INT32(0, val);
     TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("1", &val, 2));
     TEST_ASSERT_EQUAL_INT32(100, val);
+    /*
+        // TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("2.", &val, 0));
+        // TEST_ASSERT_EQUAL_INT32(2, val);
+        TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("1.0", &val, 0));
+        TEST_ASSERT_EQUAL_INT32(1, val);
+        //*/
     TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("21474836.47", &val, 2));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
     TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("-21474836.48", &val, 2));

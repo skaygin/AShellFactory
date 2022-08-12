@@ -26,7 +26,43 @@ SOFTWARE.
 #include <Shell.h>
 #include <ShellCmd.h>
 
-COMMAND_HANDLER(INT, request, response, "Conversion for int. <value>")
+COMMAND_HANDLER(BYTE, request, response, "Conversion for uint8. <value>")
+{
+    uint8_t v;
+    if (request.readUInt8(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(SBYTE, request, response, "Conversion for int8. <value>")
+{
+    int8_t v;
+    if (request.readInt8(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(WORD, request, response, "Conversion for uint16. <value>")
+{
+    uint16_t v;
+    if (request.readUInt16(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(SHORT, request, response, "Conversion for int16. <value>")
+{
+    int16_t v;
+    if (request.readInt16(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
+COMMAND_HANDLER(LONG, request, response, "Conversion for int32. <value>")
 {
     int32_t v;
     if (request.readInt32(&v) < 0)
@@ -35,7 +71,7 @@ COMMAND_HANDLER(INT, request, response, "Conversion for int. <value>")
     return 0;
 }
 
-COMMAND_HANDLER(UINT, request, response, "Conversion for uint. <value>")
+COMMAND_HANDLER(ULONG, request, response, "Conversion for uint32. <value>")
 {
     uint32_t v;
     if (request.readUInt32(&v) < 0)
@@ -66,8 +102,12 @@ DECLARE_SHELL_COMMANDS(user_commands){
     SHELL_COMMAND(VER),
     SHELL_COMMAND(PIN),
     SHELL_COMMAND(APIN),
-    SHELL_COMMAND(INT),
-    SHELL_COMMAND(UINT),
+    SHELL_COMMAND(BYTE),
+    SHELL_COMMAND(SBYTE),
+    SHELL_COMMAND(WORD),
+    SHELL_COMMAND(SHORT),
+    SHELL_COMMAND(LONG),
+    SHELL_COMMAND(ULONG),
     SHELL_COMMAND(DEC),
     // SHELL_COMMAND(EEREAD),
     // SHELL_COMMAND(EEWRITE),
