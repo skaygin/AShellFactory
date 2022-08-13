@@ -25,6 +25,7 @@ SOFTWARE.
 #include <unity.h>
 #include <Shell.h>
 #include "../TesterPrint.h"
+#include <shell/Int32Parser.h>
 
 ArgumentReader arg;
 TesterPrint testout;
@@ -55,228 +56,243 @@ void tearDown(void)
 void test_uint_conversion(void)
 {
     uint32_t val = 999;
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(" ", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(".", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1.", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(".1", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1 ", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(" 1", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1B", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("2", &val, BIN));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("8", &val, OCT));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(":", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("A", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("G", &val, HEX));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("0xAB", &val, HEX));
+    TEST_ASSERT_FALSE(strToUInt32("", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32(" ", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32(".", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("1.", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32(".1", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("1 ", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32(" 1", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("1B", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("2", &val, BIN));
+    TEST_ASSERT_FALSE(strToUInt32("8", &val, OCT));
+    TEST_ASSERT_FALSE(strToUInt32(":", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("A", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("G", &val, HEX));
+    TEST_ASSERT_FALSE(strToUInt32("0xAB", &val, HEX));
+    TEST_ASSERT_FALSE(strToUInt32("0", &val, 0));
+    TEST_ASSERT_FALSE(strToUInt32("0", &val, 1));
+    TEST_ASSERT_FALSE(strToUInt32("0", &val, 37));
     // overflow
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("100000000000000000000000000000000", &val, BIN));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("4294967296", &val, DEC));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("100000000", &val, HEX));
+    TEST_ASSERT_FALSE(strToUInt32("100000000000000000000000000000000", &val, BIN));
+    TEST_ASSERT_FALSE(strToUInt32("4294967296", &val, DEC));
+    TEST_ASSERT_FALSE(strToUInt32("100000000", &val, HEX));
     // original value does not change when false
     TEST_ASSERT_EQUAL_UINT32(999, val);
     // minimum value
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("0", &val, BIN));
+    TEST_ASSERT_TRUE(strToUInt32("0", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(0, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("0", &val, DEC));
+    TEST_ASSERT_TRUE(strToUInt32("0", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(0, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("0", &val, HEX));
+    TEST_ASSERT_TRUE(strToUInt32("0", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0, val);
     // minimum nonzero
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1", &val, BIN));
+    TEST_ASSERT_TRUE(strToUInt32("1", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1", &val, DEC));
+    TEST_ASSERT_TRUE(strToUInt32("1", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1", &val, HEX));
+    TEST_ASSERT_TRUE(strToUInt32("1", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(1, val);
     // minimum len two
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, BIN));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(2, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, OCT));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, OCT));
     TEST_ASSERT_EQUAL_UINT32(8, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, DEC));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(10, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, HEX));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(16, val);
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, 36));
+    TEST_ASSERT_EQUAL_UINT32(36, val);
     // maximum len one
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1", &val, BIN));
+    TEST_ASSERT_TRUE(strToUInt32("1", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("9", &val, DEC));
+    TEST_ASSERT_TRUE(strToUInt32("9", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(9, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("F", &val, HEX));
+    TEST_ASSERT_TRUE(strToUInt32("F", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0xF, val);
     // maximum value
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("11111111111111111111111111111111", &val, BIN));
+    TEST_ASSERT_TRUE(strToUInt32("11111111111111111111111111111111", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("4294967295", &val, DEC));
+    TEST_ASSERT_TRUE(strToUInt32("4294967295", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("FFFFffff", &val, HEX));
+    TEST_ASSERT_TRUE(strToUInt32("FFFFffff", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
     // nonstandard bases
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, 9));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, 9));
     TEST_ASSERT_EQUAL_UINT32(9, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, 11));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, 11));
     TEST_ASSERT_EQUAL_UINT32(11, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("10", &val, 15));
+    TEST_ASSERT_TRUE(strToUInt32("10", &val, 15));
     TEST_ASSERT_EQUAL_UINT32(15, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("111", &val, 3));
+    TEST_ASSERT_TRUE(strToUInt32("111", &val, 3));
     TEST_ASSERT_EQUAL_UINT32(9 + 3 + 1, val);
     // misc cases
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("012", &val));
+    TEST_ASSERT_TRUE(strToUInt32("012", &val, 10));
     TEST_ASSERT_EQUAL_UINT32(12, val);
 }
 
 void test_fraction_conversion(void)
 {
     uint32_t val = 999;
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("", &val, DEC, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32(".", &val, DEC, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1..", &val, DEC, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("1..", &val, DEC, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("12.3x", &val, DEC, 1));
-    TEST_ASSERT_FALSE(ArgumentReader::strToUInt32("12.3 ", &val, DEC, 1));
+    TEST_ASSERT_FALSE(strToUInt32("", &val, DEC, 2));
+    TEST_ASSERT_FALSE(strToUInt32(".", &val, DEC, 2));
+    TEST_ASSERT_FALSE(strToUInt32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(strToUInt32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(strToUInt32("12.3x", &val, DEC, 1));
+    TEST_ASSERT_FALSE(strToUInt32("12.3 ", &val, DEC, 1));
     //  original value does not change when false
     TEST_ASSERT_EQUAL_UINT32(999, val);
 
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1", &val, DEC, 2));
+    TEST_ASSERT_TRUE(strToUInt32("1", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(100, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("1.", &val, DEC, 2));
+    TEST_ASSERT_TRUE(strToUInt32("1.", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(100, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32(".1", &val, DEC, 2));
+    TEST_ASSERT_TRUE(strToUInt32(".1", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(10, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.3", &val, DEC, 1));
+    TEST_ASSERT_TRUE(strToUInt32("12.3", &val, DEC, 1));
     TEST_ASSERT_EQUAL_UINT32(123, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.34", &val, DEC, 2));
+    TEST_ASSERT_TRUE(strToUInt32("12.34", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(1234, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.39", &val, DEC, 1));
+    TEST_ASSERT_TRUE(strToUInt32("12.39", &val, DEC, 1));
     TEST_ASSERT_EQUAL_UINT32(123, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("11.11", &val, BIN, 2));
+    TEST_ASSERT_TRUE(strToUInt32("11.11", &val, BIN, 2));
     TEST_ASSERT_EQUAL_UINT32(0b1111, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("AB.CD", &val, HEX, 2));
+    TEST_ASSERT_TRUE(strToUInt32("AB.CD", &val, HEX, 2));
     TEST_ASSERT_EQUAL_UINT32(0xABCD, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("12.3", &val, DEC, 2));
+    TEST_ASSERT_TRUE(strToUInt32("12.3", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(1230, val);
-    TEST_ASSERT_TRUE(ArgumentReader::strToUInt32("11.1", &val, BIN, 2));
+    TEST_ASSERT_TRUE(strToUInt32("11.1", &val, BIN, 2));
     TEST_ASSERT_EQUAL_UINT32(0b1110, val);
 }
 
 void test_parse_uint32(void)
 {
     uint32_t val = 999;
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("AB", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("AB", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("0o78", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("0b12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("12A", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("+", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("++", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("++1", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("-", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("+0x12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("-12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("x1a", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseUInt32("0x", &val));
+    TEST_ASSERT_FALSE(parseUInt32("", &val));
+    TEST_ASSERT_FALSE(parseUInt32("AB", &val));
+    TEST_ASSERT_FALSE(parseUInt32("AB", &val));
+    TEST_ASSERT_FALSE(parseUInt32("0o78", &val));
+    TEST_ASSERT_FALSE(parseUInt32("0b12", &val));
+    TEST_ASSERT_FALSE(parseUInt32("12A", &val));
+    TEST_ASSERT_FALSE(parseUInt32("+", &val));
+    TEST_ASSERT_FALSE(parseUInt32("++", &val));
+    TEST_ASSERT_FALSE(parseUInt32("++1", &val));
+    TEST_ASSERT_FALSE(parseUInt32("-", &val));
+    TEST_ASSERT_FALSE(parseUInt32("+0x12", &val));
+    TEST_ASSERT_FALSE(parseUInt32("-12", &val));
+    TEST_ASSERT_FALSE(parseUInt32("x1a", &val));
+    TEST_ASSERT_FALSE(parseUInt32("0x", &val));
+    TEST_ASSERT_FALSE(parseUInt32("1.", &val));
+    TEST_ASSERT_FALSE(parseUInt32("0x1234", &val, 10));
+    TEST_ASSERT_FALSE(parseUInt32("1.", &val, 10));
     TEST_ASSERT_EQUAL_UINT32(999, val);
 
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("0", &val));
+    TEST_ASSERT_TRUE(parseUInt32("0", &val));
     TEST_ASSERT_EQUAL_UINT32(0, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("02", &val));
+    TEST_ASSERT_TRUE(parseUInt32("02", &val));
     TEST_ASSERT_EQUAL_UINT32(2, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("3", &val));
+    TEST_ASSERT_TRUE(parseUInt32("-0", &val));
+    TEST_ASSERT_EQUAL_UINT32(0, val);
+    TEST_ASSERT_TRUE(parseUInt32("3", &val));
     TEST_ASSERT_EQUAL_UINT32(3, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("+1", &val));
+    TEST_ASSERT_TRUE(parseUInt32("+0", &val));
+    TEST_ASSERT_EQUAL_UINT32(0, val);
+    TEST_ASSERT_TRUE(parseUInt32("+1", &val));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("4294967295", &val));
+    TEST_ASSERT_TRUE(parseUInt32("4294967295", &val));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("0XfFffffFF", &val));
+    TEST_ASSERT_TRUE(parseUInt32("0XfFffffFF", &val));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseUInt32("0x12ABcDEf", &val));
+    TEST_ASSERT_TRUE(parseUInt32("0x12ABcDEf", &val));
     TEST_ASSERT_EQUAL_UINT32(0x12ABCDEF, val);
 }
 
 void test_parse_int32(void)
 {
     int32_t val = 999;
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("AB", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("AB", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("0o78", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("0b12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("12A", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("+", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("++", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("++1", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("-", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("+0x12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("-0x12", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("x1a", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("0x80000000", &val));
-    TEST_ASSERT_FALSE(ArgumentReader::parseInt32("0x", &val));
+    TEST_ASSERT_FALSE(parseInt32("", &val));
+    TEST_ASSERT_FALSE(parseInt32("AB", &val));
+    TEST_ASSERT_FALSE(parseInt32("AB", &val));
+    TEST_ASSERT_FALSE(parseInt32("0o78", &val));
+    TEST_ASSERT_FALSE(parseInt32("0b12", &val));
+    TEST_ASSERT_FALSE(parseInt32("12A", &val));
+    TEST_ASSERT_FALSE(parseInt32("+", &val));
+    TEST_ASSERT_FALSE(parseInt32("++", &val));
+    TEST_ASSERT_FALSE(parseInt32("++1", &val));
+    TEST_ASSERT_FALSE(parseInt32("-", &val));
+    TEST_ASSERT_FALSE(parseInt32("+0x12", &val));
+    TEST_ASSERT_FALSE(parseInt32("-0x12", &val));
+    TEST_ASSERT_FALSE(parseInt32("x1a", &val));
+    TEST_ASSERT_FALSE(parseInt32("0x80000000", &val));
+    TEST_ASSERT_FALSE(parseInt32("0x", &val));
+    TEST_ASSERT_FALSE(parseInt32("1.", &val));
+    TEST_ASSERT_FALSE(parseInt32("0x1234", &val, 10));
+    TEST_ASSERT_FALSE(parseInt32("1.", &val, 10));
     TEST_ASSERT_EQUAL_INT32(999, val);
 
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0", &val));
+    TEST_ASSERT_TRUE(parseInt32("0", &val));
     TEST_ASSERT_EQUAL_INT32(0, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("02", &val));
+    TEST_ASSERT_TRUE(parseInt32("02", &val));
     TEST_ASSERT_EQUAL_INT32(2, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("1", &val));
+    TEST_ASSERT_TRUE(parseInt32("1", &val));
     TEST_ASSERT_EQUAL_INT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("-1", &val));
+    TEST_ASSERT_TRUE(parseInt32("-1", &val));
     TEST_ASSERT_EQUAL_INT32(-1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("+1", &val));
+    TEST_ASSERT_TRUE(parseInt32("+1", &val));
     TEST_ASSERT_EQUAL_INT32(1, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("2147483647", &val));
+    TEST_ASSERT_TRUE(parseInt32("2147483647", &val));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("-2147483648", &val));
+    TEST_ASSERT_TRUE(parseInt32("-2147483648", &val));
     TEST_ASSERT_EQUAL_INT32(0x80000000, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("+2147483647", &val));
+    TEST_ASSERT_TRUE(parseInt32("+2147483647", &val));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0X7FffffFF", &val));
+    TEST_ASSERT_TRUE(parseInt32("0X7FffffFF", &val));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0x12ABcDEf", &val));
+    TEST_ASSERT_TRUE(parseInt32("0x12ABcDEf", &val));
     TEST_ASSERT_EQUAL_INT32(0x12ABCDEF, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0b1111111111111111111111111111111", &val));
+    TEST_ASSERT_TRUE(parseInt32("0b1111111111111111111111111111111", &val));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0b10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0b10", &val));
     TEST_ASSERT_EQUAL_INT32(2, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0B10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0B10", &val));
     TEST_ASSERT_EQUAL_INT32(2, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0o10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0o10", &val));
     TEST_ASSERT_EQUAL_INT32(8, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0O10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0O10", &val));
     TEST_ASSERT_EQUAL_INT32(8, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0x10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0x10", &val));
     TEST_ASSERT_EQUAL_INT32(16, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseInt32("0X10", &val));
+    TEST_ASSERT_TRUE(parseInt32("0X10", &val));
     TEST_ASSERT_EQUAL_INT32(16, val);
 }
 
 void test_parse_decimal32(void)
 {
     int32_t val = 999;
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("", &val, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("AB", &val, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("+", &val, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("++1", &val, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("-", &val, 2));
-    TEST_ASSERT_FALSE(ArgumentReader::parseDecimal32("0x12", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("AB", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("+", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("++1", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("-", &val, 2));
+    TEST_ASSERT_FALSE(parseDecimal32("0x12", &val, 2));
     TEST_ASSERT_EQUAL_INT32(999, val);
 
-    TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("0", &val, 2));
+    TEST_ASSERT_TRUE(parseDecimal32("0", &val, 2));
     TEST_ASSERT_EQUAL_INT32(0, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("1", &val, 2));
+    TEST_ASSERT_TRUE(parseDecimal32("1", &val, 2));
     TEST_ASSERT_EQUAL_INT32(100, val);
     /*
-        // TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("2.", &val, 0));
+        // TEST_ASSERT_TRUE(parseDecimal32("2.", &val, 0));
         // TEST_ASSERT_EQUAL_INT32(2, val);
-        TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("1.0", &val, 0));
+        TEST_ASSERT_TRUE(parseDecimal32("1.0", &val, 0));
         TEST_ASSERT_EQUAL_INT32(1, val);
         //*/
-    TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("21474836.47", &val, 2));
+    TEST_ASSERT_TRUE(parseDecimal32("21474836.47", &val, 2));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("-21474836.48", &val, 2));
+    TEST_ASSERT_TRUE(parseDecimal32("-21474836.48", &val, 2));
     TEST_ASSERT_EQUAL_INT32(0x80000000, val);
-    TEST_ASSERT_TRUE(ArgumentReader::parseDecimal32("+21474836.47", &val, 2));
+    TEST_ASSERT_TRUE(parseDecimal32("+21474836.47", &val, 2));
     TEST_ASSERT_EQUAL_INT32(0x7fffffff, val);
 }
 
@@ -292,7 +308,7 @@ void test_read_cmdline(void)
     TEST_ASSERT_EQUAL_INT8(3, res);
     TEST_ASSERT_EQUAL_STRING(str, ("TXT"));
     int16_t num;
-    res = arg.readInt16(&num, 1, 12);
+    res = arg.readInt(&num, 1, 12);
     TEST_ASSERT_EQUAL_INT8(2, res);
     TEST_ASSERT_EQUAL_INT16(12, num);
     uint8_t enm;
@@ -318,7 +334,7 @@ void test_read_cmdline_wrong_order(void)
     arg.begin(&cmdline[0]);
     // arg.begin("txt 12  on"); // this fails with native, mega passes
     int16_t num = 99;
-    int8_t res = arg.readInt16(&num);
+    int8_t res = arg.readInt(&num);
     TEST_ASSERT_EQUAL_INT8(-3, res);
     TEST_ASSERT_EQUAL_INT16(99, num);
     TEST_ASSERT_EQUAL_STRING(arg.peek(), ("12  on"));

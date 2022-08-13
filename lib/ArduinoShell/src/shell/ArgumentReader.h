@@ -48,21 +48,18 @@ class ArgumentReader
 private:
     byte *cmdptr_;
     char separator_;
+    int8_t readInt_(void *arg, uint8_t byte_count, int32_t min, int32_t max);
 
 public:
-    static bool strToUInt32(const char *str, uint32_t *result, int base = DEC, uint8_t fraction_places = 0);
-    static bool parseUInt32(const char *str, uint32_t *result);
-    static bool parseInt32(const char *str, int32_t *result);
-    static bool parseDecimal32(const char *str, int32_t *result, uint8_t decimal_places);
     ArgumentReader(char separator = ' ');
     void begin(byte *cmdlinebuf);
-    int8_t readDecimal32(int32_t *arg, uint8_t decimal_places, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
-    int8_t readUInt32(uint32_t *arg, uint32_t min = 0, uint32_t max = 0xffffffff);
-    int8_t readInt32(int32_t *arg, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
-    int8_t readUInt16(uint16_t *arg, uint16_t min = 0, uint16_t max = 0xffff);
-    int8_t readInt16(int16_t *arg, int16_t min = -32768, int16_t max = 32767);
-    int8_t readUInt8(uint8_t *arg, uint8_t min = 0, uint8_t max = 255);
-    int8_t readInt8(int8_t *arg, int8_t min = -128, int8_t max = 127);
+    int8_t readDecimal(uint8_t decimal_places, int32_t *arg, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
+    int8_t readInt(uint32_t *arg, uint32_t min = 0, uint32_t max = 0xffffffff);
+    int8_t readInt(int32_t *arg, int32_t min = (int32_t)0x80000000, int32_t max = 0x7fffffff);
+    int8_t readInt(uint16_t *arg, uint16_t min = 0, uint16_t max = 65535);
+    int8_t readInt(int16_t *arg, int16_t min = -32768, int16_t max = 32767);
+    int8_t readInt(uint8_t *arg, uint8_t min = 0, uint8_t max = 255);
+    int8_t readInt(int8_t *arg, int8_t min = -128, int8_t max = 127);
     int8_t readEnum(uint8_t *arg, PGM_P options, char delimiter = '|');
     int8_t readHex(uint32_t *arg, uint32_t min = 0, uint32_t max = 0xffffffff);
     int readString(char **arg, bool uppercase, char separator);

@@ -21,45 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "ShellCmdPIN.h"
+#ifndef _INT32_PARSER_H_
+#define _INT32_PARSER_H_
 
-IMPLEMENT_COMMAND_HANDLER(PIN, request, response)
-{
-    int16_t pin;
-    if (!request.readInt(&pin))
-        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
-    uint8_t value;
-    PGM_P options = PSTR("LOW|HIGH|INPUT|OUTPUT|PULLUP");
-    int8_t ret = request.readEnum(&value, options);
-    if (ret < 0)
-        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
-    if (ret)
-    {
-        if (value < 2) // low,high
-            digitalWrite(pin, value);
-        else // input,output,pullup
-            pinMode(pin, value - 2);
-    }
-    else
-        value = digitalRead(pin);
-    response.print(pin);
-    response.write(' ');
-    ArgumentReader::printEnum(response, value, options);
-    return 0;
-}
+#include <Arduino.h>
 
-IMPLEMENT_COMMAND_HANDLER(APIN, request, response)
-{
-    int16_t pin;
-    if (!request.readInt(&pin))
-        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
-    int16_t value;
-    if (!request.readInt(&value))
-        value = analogRead(pin);
-    else
-        analogWrite(pin, value);
-    response.print(pin);
-    response.write(' ');
-    response.print(value);
-    return 0;
-}
+bool strToUInt32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128);
+bool parseUInt32(const char *str_literal, uint32_t *out, uint8_t base = 0);
+bool parseInt32(const char *str_literal, int32_t *out, uint8_t base = 0);
+bool parseDecimal32(const char *str_literal, int32_t *out, uint8_t decimal_places);
+
+#endif //_INT32_PARSER_H_

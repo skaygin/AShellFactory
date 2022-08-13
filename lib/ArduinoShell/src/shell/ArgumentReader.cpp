@@ -22,154 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "ArgumentReader.h"
-
-bool baseToUInt32_(const char *str, uint32_t *result, int base, uint8_t fraction_places)
-{
-  if (base < 2 || base > 16)
-    return false;
-  char cur = *(str++);
-  if (!cur)
-    return false;
-  if (cur == '.' && !*str)
-    return false;
-  uint8_t fracremain = fraction_places;
-  bool frac = false;
-  uint32_t val = 0;
-  while (cur || fracremain)
-  {
-    if (!cur && fraction_places)
-      frac = true;
-    char c = cur ? cur : '0';
-    if (c == '.')
-    {
-      if (frac || !fraction_places)
-        return false; // already in fraction part or fraction not allowed
-      frac = true;
-    }
-    else if (c < '0')
-      return false; // illegal chars including 0x20
-    else
-    {
-      uint8_t inc = 0;
-      char C = c & ~0x20; // to uppercase for hex
-      if (c <= '9')
-      {
-        inc = c - '0';
-        if (base < (inc + 1))
-          return false;
-      }
-      else if (C >= 'A' && C <= 'F')
-      {
-        inc = C - ('A' - 10);
-        if (base < (inc + 1))
-          return false;
-      }
-      else
-        return false;
-      if (!frac || fracremain) // otherwise truncated (ignored)
-      {
-        uint32_t oldval = val;
-        val *= base;
-        if ((val / base) != oldval)
-          return false; // overflow
-        oldval = val;
-        val += inc;
-        if (val < oldval)
-          return false; // overflow
-      }
-      if (frac && fracremain)
-        fracremain--;
-    }
-    if (cur)
-      cur = *(str++);
-  }
-  *result = val;
-  return true;
-}
-
-// Uses python convention, sign not allowed here
-bool parseUInt32_(const char *str, uint32_t *result)
-{
-  int base = 0;
-  if (*str == '0')
-  {
-    char c2 = *(str + 1) & ~0x20; // to uppercase, zero remains
-    if (c2 == 'X')
-      base = 16;
-    else if (c2 == 'B')
-      base = 2;
-    else if (c2 == 'O')
-      base = 8;
-  }
-  if (!base)
-    base = 10;
-  else
-    str += 2;
-  return baseToUInt32_(str, result, base, 0);
-}
-
-bool parseInt32_(const char *str, int32_t *result, uint8_t decimal_places = 0)
-{
-  char c = *str;
-  bool isneg = false;
-  uint32_t ul;
-  bool parsed;
-  if (c == '+' || c == '-')
-  {
-    str++;
-    isneg = (c == '-');
-    parsed = baseToUInt32_(str, &ul, DEC, decimal_places);
-  }
-  else
-  {
-    if (decimal_places)
-      parsed = baseToUInt32_(str, &ul, DEC, decimal_places);
-    else
-      parsed = parseUInt32_(str, &ul);
-  }
-  if (!parsed)
-    return false;
-  if (isneg)
-  {
-    if (ul > 0x80000000)
-      return false;
-    int32_t lv = ul - 1;
-    lv = -lv - 1;
-    *result = lv;
-  }
-  else
-  {
-    if (ul > 0x7fffffff)
-      return false;
-    *result = ul;
-  }
-  return true;
-}
-
-bool ArgumentReader::strToUInt32(const char *str, uint32_t *result, int base, uint8_t fraction_places)
-{
-  return baseToUInt32_(str, result, base, fraction_places);
-}
-
-bool ArgumentReader::parseUInt32(const char *str, uint32_t *result)
-{
-  if (*str == '+')
-  {
-    str++;
-    return baseToUInt32_(str, result, DEC, 0);
-  }
-  return parseUInt32_(str, result);
-}
-
-bool ArgumentReader::parseInt32(const char *str, int32_t *result)
-{
-  return parseInt32_(str, result);
-}
-
-bool ArgumentReader::parseDecimal32(const char *str, int32_t *result, uint8_t decimal_places)
-{
-  return parseInt32_(str, result, decimal_places);
-}
+#include "Int32Parser.h"
 
 ArgumentReader::ArgumentReader(char separator)
 {
@@ -181,7 +34,7 @@ void ArgumentReader::begin(byte *cmdlinebuf)
   cmdptr_ = cmdlinebuf;
 }
 
-int8_t ArgumentReader::readDecimal32(int32_t *arg, uint8_t decimal_places, int32_t min, int32_t max)
+int8_t ArgumentReader::readDecimal(uint8_t decimal_places, int32_t *arg, int32_t min, int32_t max)
 {
   char *vstr;
   int8_t len = readString(&vstr, false);
@@ -196,7 +49,27 @@ int8_t ArgumentReader::readDecimal32(int32_t *arg, uint8_t decimal_places, int32
   return len;
 }
 
-int8_t ArgumentReader::readUInt32(uint32_t *arg, uint32_t min, uint32_t max)
+int8_t ArgumentReader::readInt_(void *arg, uint8_t byte_count, int32_t min, int32_t max)
+{
+  char *vstr;
+  int8_t len = readString(&vstr, false);
+  if (!len)
+    return 0;
+  int32_t lv;
+  if (!parseInt32(vstr, &lv))
+    return -len;
+  if (lv < min || lv > max)
+    return -len;
+  if (byte_count & 1)
+    (*(uint8_t *)arg) = lv;
+  else if (byte_count & 2)
+    (*(uint16_t *)arg) = lv;
+  else if (byte_count & 4)
+    (*(uint32_t *)arg) = lv;
+  return len;
+}
+
+int8_t ArgumentReader::readInt(uint32_t *arg, uint32_t min, uint32_t max)
 {
   char *vstr;
   int8_t len = readString(&vstr, false);
@@ -211,55 +84,29 @@ int8_t ArgumentReader::readUInt32(uint32_t *arg, uint32_t min, uint32_t max)
   return len;
 }
 
-int8_t ArgumentReader::readInt32(int32_t *arg, int32_t min, int32_t max)
+int8_t ArgumentReader::readInt(int32_t *arg, int32_t min, int32_t max)
 {
-  char *vstr;
-  int8_t len = readString(&vstr, false);
-  if (!len)
-    return 0;
-  int32_t lv;
-  if (!parseInt32(vstr, &lv))
-    return -len;
-  if (lv < min || lv > max)
-    return -len;
-  *arg = lv;
-  return len;
+  return readInt_(arg, 4, min, max);
 }
 
-int8_t ArgumentReader::readUInt16(uint16_t *arg, uint16_t min, uint16_t max)
+int8_t ArgumentReader::readInt(uint16_t *arg, uint16_t min, uint16_t max)
 {
-  uint32_t lv;
-  int8_t len = readUInt32(&lv, min, max);
-  if (len > 0)
-    *arg = lv;
-  return len;
+  return readInt_(arg, 2, min, max);
 }
 
-int8_t ArgumentReader::readInt16(int16_t *arg, int16_t min, int16_t max)
+int8_t ArgumentReader::readInt(int16_t *arg, int16_t min, int16_t max)
 {
-  int32_t lv;
-  int8_t len = readInt32(&lv, min, max);
-  if (len > 0)
-    *arg = lv;
-  return len;
+  return readInt_(arg, 2, min, max);
 }
 
-int8_t ArgumentReader::readUInt8(uint8_t *arg, uint8_t min, uint8_t max)
+int8_t ArgumentReader::readInt(uint8_t *arg, uint8_t min, uint8_t max)
 {
-  uint32_t lv;
-  int8_t len = readUInt32(&lv, min, max);
-  if (len > 0)
-    *arg = lv;
-  return len;
+  return readInt_(arg, 1, min, max);
 }
 
-int8_t ArgumentReader::readInt8(int8_t *arg, int8_t min, int8_t max)
+int8_t ArgumentReader::readInt(int8_t *arg, int8_t min, int8_t max)
 {
-  int32_t lv;
-  int8_t len = readInt32(&lv, min, max);
-  if (len > 0)
-    *arg = lv;
-  return len;
+  return readInt_(arg, 1, min, max);
 }
 
 int8_t ArgumentReader::readHex(uint32_t *arg, uint32_t min, uint32_t max)
@@ -269,7 +116,7 @@ int8_t ArgumentReader::readHex(uint32_t *arg, uint32_t min, uint32_t max)
   if (!len)
     return 0;
   uint32_t ul;
-  if (!strToUInt32(hexstr, &ul, HEX))
+  if (!parseUInt32(hexstr, &ul, 16))
     return -len;
   if (ul < min || ul > max)
     return -len;
@@ -345,8 +192,10 @@ int ArgumentReader::readString(char **arg, bool uppercase, char separator)
       *cmdptr_ = *cmdptr_ & ~0x20;
     cmdptr_++;
   }
+  return len;
+  // most of other read functions assume max 127 length, except for readToEnd and readString
   // ensure maxlen is 127 to fit into uint8_t
-  return len > 127 ? 127 : len;
+  // return len > 127 ? 127 : len;
 }
 
 int ArgumentReader::readString(char **arg, bool uppercase)

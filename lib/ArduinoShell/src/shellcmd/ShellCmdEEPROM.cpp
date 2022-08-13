@@ -27,12 +27,12 @@ SOFTWARE.
 IMPLEMENT_COMMAND_HANDLER(EEREAD, request, response)
 {
     int16_t address;
-    if (request.readInt16(&address) <= 0)
+    if (request.readInt(&address) <= 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     if (address < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     int16_t count = 256;
-    request.readInt16(&count);
+    request.readInt(&count);
     if (count <= 0 || count > 1024)
         count = 1024;
     while (count)
@@ -57,7 +57,7 @@ int8_t hexupcase2int(char c)
 IMPLEMENT_COMMAND_HANDLER(EEWRITE, request, response)
 {
     int16_t address;
-    if (request.readInt16(&address) <= 0)
+    if (request.readInt(&address) <= 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     if (address < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;

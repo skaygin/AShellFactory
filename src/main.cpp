@@ -29,7 +29,7 @@ SOFTWARE.
 COMMAND_HANDLER(BYTE, request, response, "Conversion for uint8. <value>")
 {
     uint8_t v;
-    if (request.readUInt8(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -38,7 +38,7 @@ COMMAND_HANDLER(BYTE, request, response, "Conversion for uint8. <value>")
 COMMAND_HANDLER(SBYTE, request, response, "Conversion for int8. <value>")
 {
     int8_t v;
-    if (request.readInt8(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -47,7 +47,7 @@ COMMAND_HANDLER(SBYTE, request, response, "Conversion for int8. <value>")
 COMMAND_HANDLER(WORD, request, response, "Conversion for uint16. <value>")
 {
     uint16_t v;
-    if (request.readUInt16(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -56,7 +56,7 @@ COMMAND_HANDLER(WORD, request, response, "Conversion for uint16. <value>")
 COMMAND_HANDLER(SHORT, request, response, "Conversion for int16. <value>")
 {
     int16_t v;
-    if (request.readInt16(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -65,7 +65,7 @@ COMMAND_HANDLER(SHORT, request, response, "Conversion for int16. <value>")
 COMMAND_HANDLER(LONG, request, response, "Conversion for int32. <value>")
 {
     int32_t v;
-    if (request.readInt32(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -74,7 +74,7 @@ COMMAND_HANDLER(LONG, request, response, "Conversion for int32. <value>")
 COMMAND_HANDLER(ULONG, request, response, "Conversion for uint32. <value>")
 {
     uint32_t v;
-    if (request.readUInt32(&v) < 0)
+    if (request.readInt(&v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -83,7 +83,7 @@ COMMAND_HANDLER(ULONG, request, response, "Conversion for uint32. <value>")
 COMMAND_HANDLER(DEC, request, response, "Conversion for decimal. <value>")
 {
     int32_t v;
-    if (request.readDecimal32(&v, 2) < 0)
+    if (request.readDecimal(2, &v) < 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     response.print(v);
     return 0;
@@ -162,7 +162,7 @@ void loop()
     Shell.tick();
 }
 
-#ifdef ENV_NATIVE
+#ifdef __AVR_Native__
 // in native mode, debug the program with single loop
 int main()
 {
