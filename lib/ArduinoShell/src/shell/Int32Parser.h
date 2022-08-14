@@ -26,7 +26,11 @@ SOFTWARE.
 
 #include <Arduino.h>
 
-bool strToUInt32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128);
+// Positional numeral with a specified base(radix) 2-36,
+// Has fractions after radix point, -128 means no radix point allowed
+// Negative fraction_places are reserved for now, only positive ones are implemented
+bool parsePositional32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128);
+
 bool parseUInt32(const char *str_literal, uint32_t *out, uint8_t base = 0);
 bool parseInt32(const char *str_literal, int32_t *out, uint8_t base = 0);
 bool parseDecimal32(const char *str_literal, int32_t *out, uint8_t decimal_places);

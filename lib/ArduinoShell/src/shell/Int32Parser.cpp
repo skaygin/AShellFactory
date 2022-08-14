@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #include "Int32Parser.h"
 
+// base is exact
 // fraction_places -128 means no dots expected, otherwise dots are allowed, e.g. 1.0 1. or hex A. A.0
 bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128)
 {
@@ -90,11 +91,18 @@ bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fra
     return true;
 }
 
-// Uses python convention, sign not allowed here
-bool parseUInt32_(const char *str, uint32_t *out, uint8_t base = 0)
+bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_t maxpos, uint8_t base = 0, int8_t fraction_places = -128)
 {
+    char c = *str;
+    bool isneg = false;
+    uint32_t ul;
+    if (c == '+' || c == '-')
+    {
+        isneg = (c == '-');
+        c = *(++str);
+    }
     int b = 0;
-    if (*str == '0')
+    if (c == '0')
     {
         char c2 = *(str + 1) & ~0x20; // to uppercase, zero remains
         if (c2 == 'X')
@@ -112,86 +120,43 @@ bool parseUInt32_(const char *str, uint32_t *out, uint8_t base = 0)
         base = b;
     else if (base != b)
         return false;
-    return exactBaseToUInt32_(str, out, base);
-}
-
-bool parseInt32_(const char *str, int32_t *out, uint8_t base, int8_t decimal_places = -128)
-{
-    char c = *str;
-    bool isneg = false;
-    uint32_t ul;
-    bool parsed;
-    if (c == '+' || c == '-')
-    {
-        // sign implies decimal
-        str++;
-        isneg = (c == '-');
-        if (base && base != 10)
-            return false;
-        parsed = exactBaseToUInt32_(str, &ul, DEC, decimal_places);
-    }
-    else
-    {
-        if (decimal_places != -128)
-        {
-            if (base && base != 10)
-                return false;
-            parsed = exactBaseToUInt32_(str, &ul, 10, decimal_places);
-        }
-        else
-            parsed = parseUInt32_(str, &ul, base);
-    }
-    if (!parsed)
+    if (!exactBaseToUInt32_(str, &ul, base, fraction_places))
         return false;
     if (isneg)
     {
-        if (ul > 0x80000000)
+        if (ul > maxneg)
             return false;
         int32_t lv = ul - 1;
         lv = -lv - 1;
-        *out = lv;
+        *((int32_t *)out) = lv;
     }
     else
     {
-        if (ul > 0x7fffffff)
+        if (ul > maxpos)
             return false;
-        *out = ul;
+        *((uint32_t *)out) = ul;
     }
     return true;
 }
 
-bool strToUInt32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places)
+bool parsePositional32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places)
 {
     return exactBaseToUInt32_(str, out, base, fraction_places);
 }
 
 bool parseUInt32(const char *literal, uint32_t *out, uint8_t base)
 {
-    char c = *literal;
-    if (c == '+' || c == '-')
-    {
-        literal++;
-        uint32_t v;
-        if (base && base != 10)
-            return false;
-        if (!exactBaseToUInt32_(literal, &v, 10))
-            return false;
-        if (c == '-' && v)
-            return false;
-        *out = v;
-        return true;
-    }
-    return parseUInt32_(literal, out, base);
+    return parse_signed_autobase_(literal, out, 0, 0xffffffff, base);
 }
 
 bool parseInt32(const char *literal, int32_t *out, uint8_t base)
 {
-    return parseInt32_(literal, out, base);
+    return parse_signed_autobase_(literal, out, 0x80000000, 0x7fffffff, base);
 }
 
 bool parseDecimal32(const char *literal, int32_t *out, uint8_t decimal_places)
 {
     if (decimal_places > 127)
         decimal_places = 127;
-    return parseInt32_(literal, out, 10, decimal_places);
+    return parse_signed_autobase_(literal, out, 0x80000000, 0x7fffffff, 10, decimal_places);
 }

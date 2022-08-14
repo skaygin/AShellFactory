@@ -44,7 +44,7 @@ handler(VER, "Displays firmware version.")
 handler(TEST, "Used for unit testing. <month>")
 {
     int16_t month;
-    int8_t res = request.readInt16(&month, 1, 12);
+    int8_t res = request.readInt(&month, 1, 12);
     if (res <= 0)
         return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
     char *str = request.peek();
@@ -59,7 +59,7 @@ handler(TEST, "Used for unit testing. <month>")
 handler(A, "Short command no dot")
 {
     int16_t code;
-    if (!request.readInt16(&code))
+    if (!request.readInt(&code))
         return 0;
     return code;
 }
