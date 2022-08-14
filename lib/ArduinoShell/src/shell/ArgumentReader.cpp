@@ -67,19 +67,24 @@ int8_t ArgumentReader::read_int32_t(void *arg, uint8_t byte_size, int32_t min, i
   return len;
 }
 
-int8_t ArgumentReader::readInt(uint32_t *arg, uint32_t min, uint32_t max)
+int8_t ArgumentReader::read_uint32_t(uint32_t *arg, uint32_t min, uint32_t max, uint8_t base)
 {
   char *vstr;
   int8_t len = readString(&vstr, false);
   if (!len)
     return 0;
   uint32_t ul;
-  if (!parseUInt32(vstr, &ul))
+  if (!parseUInt32(vstr, &ul, base))
     return -len;
   if (ul < min || ul > max)
     return -len;
   *arg = ul;
   return len;
+}
+
+int8_t ArgumentReader::readInt(uint32_t *arg, uint32_t min, uint32_t max)
+{
+  return read_uint32_t(arg, min, max);
 }
 
 int8_t ArgumentReader::readInt(int32_t *arg, int32_t min, int32_t max)
@@ -109,7 +114,7 @@ int8_t ArgumentReader::readInt(int8_t *arg, int8_t min, int8_t max)
 
 int8_t ArgumentReader::readHex(uint32_t *arg, uint32_t min, uint32_t max)
 {
-  return read_int32_t(arg, sizeof(uint8_t), min, max, 16);
+  return read_uint32_t(arg, min, max, 16);
 }
 
 int8_t ArgumentReader::readEnum(uint8_t *arg, PGM_P options, char delimiter)

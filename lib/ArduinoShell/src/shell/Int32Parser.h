@@ -27,6 +27,7 @@ SOFTWARE.
 #include <Arduino.h>
 
 // Positional numeral with a specified base(radix) 2-36,
+// Decimal is an example to this with radix 10.
 // Has fractions after radix point, -128 means no radix point allowed
 // Negative fraction_places are reserved for now, only positive ones are implemented
 bool parsePositional32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128);

@@ -89,6 +89,15 @@ COMMAND_HANDLER(DEC, request, response, "Conversion for decimal. <value>")
     return 0;
 }
 
+COMMAND_HANDLER(HEX, request, response, "Conversion for hexadecimal. <value>")
+{
+    uint32_t v;
+    if (request.readHex(&v) < 0)
+        return SHELL_RESPONSE_ERR_BAD_ARGUMENT;
+    response.print(v);
+    return 0;
+}
+
 DECLARE_COMMAND_HANDLER(LOGIN, "Logs in and enables user commands.");
 DECLARE_COMMAND_HANDLER(LOGOUT, "Logs out and disables user commands.");
 
@@ -109,6 +118,7 @@ DECLARE_SHELL_COMMANDS(user_commands){
     SHELL_COMMAND(LONG),
     SHELL_COMMAND(ULONG),
     SHELL_COMMAND(DEC),
+    SHELL_COMMAND(HEX),
     // SHELL_COMMAND(EEREAD),
     // SHELL_COMMAND(EEWRITE),
     SHELL_COMMAND(FREEMEM),

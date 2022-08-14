@@ -48,6 +48,7 @@ class ArgumentReader
 private:
     byte *cmdptr_;
     char separator_;
+    int8_t read_uint32_t(uint32_t *arg, uint32_t min, uint32_t max, uint8_t base = 0);
     int8_t read_int32_t(void *arg, uint8_t byte_size, int32_t min, int32_t max, uint8_t base = 0);
 
 public:

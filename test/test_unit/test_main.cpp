@@ -207,6 +207,8 @@ void test_parse_uint32(void)
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
     TEST_ASSERT_TRUE(parseUInt32("0x12ABcDEf", &val));
     TEST_ASSERT_EQUAL_UINT32(0x12ABCDEF, val);
+    TEST_ASSERT_TRUE(parseUInt32("1ABcDEf", &val, 16));
+    TEST_ASSERT_EQUAL_UINT32(0x1ABCDEF, val);
 }
 
 void test_parse_int32(void)

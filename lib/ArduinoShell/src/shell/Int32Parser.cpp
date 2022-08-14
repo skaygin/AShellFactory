@@ -111,15 +111,15 @@ bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_
             b = 2;
         else if (c2 == 'O')
             b = 8;
+        if (b)
+            str += 2;
     }
+    if (b && base && base != b)
+        return false;
     if (!b)
         b = 10;
-    else
-        str += 2;
     if (!base)
         base = b;
-    else if (base != b)
-        return false;
     if (!exactBaseToUInt32_(str, &ul, base, fraction_places))
         return false;
     if (isneg)
