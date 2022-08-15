@@ -25,10 +25,105 @@ SOFTWARE.
 
 // base is exact
 // fraction_places -128 means no dots expected, otherwise dots are allowed, e.g. 1.0 1. or hex A. A.0
-bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places = -128)
+bool parseFixedPoint32(const char *str, uint32_t *out, uint8_t base, int8_t exp)
 {
-    if (fraction_places == -128)
-        fraction_places = 0;
+    if (base < 2 || base > 36)
+        return false;
+    char c = *(str++);
+    if (!c || (c == '.' && !*str))
+        return false;
+    uint8_t fracremain = exp < 0 ? 0 : exp;
+    bool infrac = false;
+    uint8_t ovf = 0;
+    uint32_t val = 0;
+    while (c || fracremain)
+    {
+        if (!c)
+        {
+            if (infrac)
+                c = '0';
+            else
+                c = '.';
+        }
+        // start of loop
+        if (c == '.')
+        {
+            if (infrac || exp == -128)
+                return false; // already in fraction part or fraction not allowed
+            infrac = true;
+        }
+        else
+        {
+            // Check validity of the char and compute increment
+            uint8_t inc = 0;
+            char C = c & ~0x20; // to uppercase for hex
+            if (c < '0')
+                return false; // illegal chars including 0x20
+            else if (c <= '9')
+            {
+                inc = c - '0';
+                if (base <= inc)
+                    return false;
+            }
+            else if (C >= 'A' && C <= 'Z')
+            {
+                inc = (C - 'A') + 10;
+                if (base <= inc)
+                    return false;
+            }
+            else
+                return false;
+            // now we know that char is valid
+            bool compute = false;
+            if (infrac)
+                compute = fracremain || ovf;
+            else
+            {
+                if (ovf)
+                    ovf++;
+                else
+                    compute = true;
+            }
+            if (compute) // otherwise truncated (ignored)
+            {
+                uint32_t oldval = val;
+                val *= base;
+                if ((val / base) != oldval)
+                    ovf++;
+                else
+                {
+                    oldval = val;
+                    val += inc;
+                    if (val < oldval)
+                        ovf++;
+                }
+            }
+            if (infrac && fracremain)
+                fracremain--;
+        }
+        // end of loop
+        c = *str;
+        if (c)
+            str++;
+    }
+    if (exp < 0 && exp != -128)
+    {
+        int denompow = ovf + exp;
+        if (denompow > 0)
+            return false;
+        while (denompow++ < 0)
+            val /= base;
+    }
+    else if (ovf)
+        return false;
+    *out = val;
+    return true;
+}
+
+/*
+{
+    if (exp == -128)
+        exp = 0;
     if (base < 2 || base > 36)
         return false;
     char cur = *(str++);
@@ -36,17 +131,17 @@ bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fra
         return false;
     if (cur == '.' && !*str)
         return false;
-    uint8_t fracremain = fraction_places;
+    uint8_t fracremain = exp;
     bool frac = false;
     uint32_t val = 0;
     while (cur || fracremain)
     {
-        if (!cur && fraction_places)
+        if (!cur && exp)
             frac = true;
         char c = cur ? cur : '0';
         if (c == '.')
         {
-            if (frac || !fraction_places)
+            if (frac || !exp)
                 return false; // already in fraction part or fraction not allowed
             frac = true;
         }
@@ -59,13 +154,13 @@ bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fra
             if (c <= '9')
             {
                 inc = c - '0';
-                if (base < (inc + 1))
+                if (base <= inc)
                     return false;
             }
             else if (C >= 'A' && C <= 'Z')
             {
                 inc = C - ('A' - 10);
-                if (base < (inc + 1))
+                if (base <= inc)
                     return false;
             }
             else
@@ -90,8 +185,9 @@ bool exactBaseToUInt32_(const char *str, uint32_t *out, uint8_t base, int8_t fra
     *out = val;
     return true;
 }
+*/
 
-bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_t maxpos, uint8_t base = 0, int8_t fraction_places = -128)
+bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_t maxpos, uint8_t base = 0, int8_t exp = -128)
 {
     char c = *str;
     bool isneg = false;
@@ -120,7 +216,7 @@ bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_
         b = 10;
     if (!base)
         base = b;
-    if (!exactBaseToUInt32_(str, &ul, base, fraction_places))
+    if (!parseFixedPoint32(str, &ul, base, exp))
         return false;
     if (isneg)
     {
@@ -137,11 +233,6 @@ bool parse_signed_autobase_(const char *str, void *out, uint32_t maxneg, uint32_
         *((uint32_t *)out) = ul;
     }
     return true;
-}
-
-bool parsePositional32(const char *str, uint32_t *out, uint8_t base, int8_t fraction_places)
-{
-    return exactBaseToUInt32_(str, out, base, fraction_places);
 }
 
 bool parseUInt32(const char *literal, uint32_t *out, uint8_t base)

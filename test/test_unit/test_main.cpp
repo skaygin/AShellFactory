@@ -56,114 +56,121 @@ void tearDown(void)
 void test_uint_conversion(void)
 {
     uint32_t val = 999;
-    TEST_ASSERT_FALSE(parsePositional32("", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32(" ", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32(".", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("1.", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32(".1", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("1 ", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32(" 1", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("1B", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("2", &val, BIN));
-    TEST_ASSERT_FALSE(parsePositional32("8", &val, OCT));
-    TEST_ASSERT_FALSE(parsePositional32(":", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("A", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("G", &val, HEX));
-    TEST_ASSERT_FALSE(parsePositional32("0xAB", &val, HEX));
-    TEST_ASSERT_FALSE(parsePositional32("0", &val, 0));
-    TEST_ASSERT_FALSE(parsePositional32("0", &val, 1));
-    TEST_ASSERT_FALSE(parsePositional32("0", &val, 37));
+    TEST_ASSERT_FALSE(parseFixedPoint32("", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32(" ", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32(".", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("1.", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32(".1", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("1 ", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32(" 1", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("1B", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("2", &val, BIN));
+    TEST_ASSERT_FALSE(parseFixedPoint32("8", &val, OCT));
+    TEST_ASSERT_FALSE(parseFixedPoint32(":", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("A", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("G", &val, HEX));
+    TEST_ASSERT_FALSE(parseFixedPoint32("0xAB", &val, HEX));
+    TEST_ASSERT_FALSE(parseFixedPoint32("0", &val, 0));
+    TEST_ASSERT_FALSE(parseFixedPoint32("0", &val, 1));
+    TEST_ASSERT_FALSE(parseFixedPoint32("0", &val, 37));
     // overflow
-    TEST_ASSERT_FALSE(parsePositional32("100000000000000000000000000000000", &val, BIN));
-    TEST_ASSERT_FALSE(parsePositional32("4294967296", &val, DEC));
-    TEST_ASSERT_FALSE(parsePositional32("100000000", &val, HEX));
+    TEST_ASSERT_FALSE(parseFixedPoint32("100000000000000000000000000000000", &val, BIN));
+    TEST_ASSERT_FALSE(parseFixedPoint32("4294967296", &val, DEC));
+    TEST_ASSERT_FALSE(parseFixedPoint32("100000000", &val, HEX));
     // original value does not change when false
     TEST_ASSERT_EQUAL_UINT32(999, val);
     // minimum value
-    TEST_ASSERT_TRUE(parsePositional32("0", &val, BIN));
+    TEST_ASSERT_TRUE(parseFixedPoint32("0", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(0, val);
-    TEST_ASSERT_TRUE(parsePositional32("0", &val, DEC));
+    TEST_ASSERT_TRUE(parseFixedPoint32("0", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(0, val);
-    TEST_ASSERT_TRUE(parsePositional32("0", &val, HEX));
+    TEST_ASSERT_TRUE(parseFixedPoint32("0", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0, val);
     // minimum nonzero
-    TEST_ASSERT_TRUE(parsePositional32("1", &val, BIN));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(parsePositional32("1", &val, DEC));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(parsePositional32("1", &val, HEX));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(1, val);
     // minimum len two
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, BIN));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(2, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, OCT));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, OCT));
     TEST_ASSERT_EQUAL_UINT32(8, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, DEC));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(10, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, HEX));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(16, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, 36));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, 36));
     TEST_ASSERT_EQUAL_UINT32(36, val);
     // maximum len one
-    TEST_ASSERT_TRUE(parsePositional32("1", &val, BIN));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(1, val);
-    TEST_ASSERT_TRUE(parsePositional32("9", &val, DEC));
+    TEST_ASSERT_TRUE(parseFixedPoint32("9", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(9, val);
-    TEST_ASSERT_TRUE(parsePositional32("F", &val, HEX));
+    TEST_ASSERT_TRUE(parseFixedPoint32("F", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0xF, val);
     // maximum value
-    TEST_ASSERT_TRUE(parsePositional32("11111111111111111111111111111111", &val, BIN));
+    TEST_ASSERT_TRUE(parseFixedPoint32("11111111111111111111111111111111", &val, BIN));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(parsePositional32("4294967295", &val, DEC));
+    TEST_ASSERT_TRUE(parseFixedPoint32("4294967295", &val, DEC));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
-    TEST_ASSERT_TRUE(parsePositional32("FFFFffff", &val, HEX));
+    TEST_ASSERT_TRUE(parseFixedPoint32("FFFFffff", &val, HEX));
     TEST_ASSERT_EQUAL_UINT32(0xffffffff, val);
     // nonstandard bases
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, 9));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, 9));
     TEST_ASSERT_EQUAL_UINT32(9, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, 11));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, 11));
     TEST_ASSERT_EQUAL_UINT32(11, val);
-    TEST_ASSERT_TRUE(parsePositional32("10", &val, 15));
+    TEST_ASSERT_TRUE(parseFixedPoint32("10", &val, 15));
     TEST_ASSERT_EQUAL_UINT32(15, val);
-    TEST_ASSERT_TRUE(parsePositional32("111", &val, 3));
+    TEST_ASSERT_TRUE(parseFixedPoint32("111", &val, 3));
     TEST_ASSERT_EQUAL_UINT32(9 + 3 + 1, val);
     // misc cases
-    TEST_ASSERT_TRUE(parsePositional32("012", &val, 10));
+    TEST_ASSERT_TRUE(parseFixedPoint32("012", &val, 10));
     TEST_ASSERT_EQUAL_UINT32(12, val);
 }
 
 void test_fraction_conversion(void)
 {
     uint32_t val = 999;
-    TEST_ASSERT_FALSE(parsePositional32("", &val, DEC, 2));
-    TEST_ASSERT_FALSE(parsePositional32(".", &val, DEC, 2));
-    TEST_ASSERT_FALSE(parsePositional32("1..", &val, DEC, 2));
-    TEST_ASSERT_FALSE(parsePositional32("1..", &val, DEC, 2));
-    TEST_ASSERT_FALSE(parsePositional32("12.3x", &val, DEC, 1));
-    TEST_ASSERT_FALSE(parsePositional32("12.3 ", &val, DEC, 1));
+    TEST_ASSERT_FALSE(parseFixedPoint32("", &val, DEC, 2));
+    TEST_ASSERT_FALSE(parseFixedPoint32(".", &val, DEC, 2));
+    TEST_ASSERT_FALSE(parseFixedPoint32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(parseFixedPoint32("1..", &val, DEC, 2));
+    TEST_ASSERT_FALSE(parseFixedPoint32("12.3x", &val, DEC, 1));
+    TEST_ASSERT_FALSE(parseFixedPoint32("12.3 ", &val, DEC, 1));
     //  original value does not change when false
     TEST_ASSERT_EQUAL_UINT32(999, val);
 
-    TEST_ASSERT_TRUE(parsePositional32("1", &val, DEC, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1.9", &val, DEC, 0));
+    TEST_ASSERT_EQUAL_UINT32(1, val);
+    TEST_ASSERT_TRUE(parseFixedPoint32("1", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(100, val);
-    TEST_ASSERT_TRUE(parsePositional32("1.", &val, DEC, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("1.", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(100, val);
-    TEST_ASSERT_TRUE(parsePositional32(".1", &val, DEC, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32(".1", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(10, val);
-    TEST_ASSERT_TRUE(parsePositional32("12.3", &val, DEC, 1));
+    TEST_ASSERT_TRUE(parseFixedPoint32("12.3", &val, DEC, 1));
     TEST_ASSERT_EQUAL_UINT32(123, val);
-    TEST_ASSERT_TRUE(parsePositional32("12.34", &val, DEC, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("12.34", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(1234, val);
-    TEST_ASSERT_TRUE(parsePositional32("12.39", &val, DEC, 1));
+    TEST_ASSERT_TRUE(parseFixedPoint32("12.39", &val, DEC, 1));
     TEST_ASSERT_EQUAL_UINT32(123, val);
-    TEST_ASSERT_TRUE(parsePositional32("11.11", &val, BIN, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("11.11", &val, BIN, 2));
     TEST_ASSERT_EQUAL_UINT32(0b1111, val);
-    TEST_ASSERT_TRUE(parsePositional32("AB.CD", &val, HEX, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("AB.CD", &val, HEX, 2));
     TEST_ASSERT_EQUAL_UINT32(0xABCD, val);
-    TEST_ASSERT_TRUE(parsePositional32("12.3", &val, DEC, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("12.3", &val, DEC, 2));
     TEST_ASSERT_EQUAL_UINT32(1230, val);
-    TEST_ASSERT_TRUE(parsePositional32("11.1", &val, BIN, 2));
+    TEST_ASSERT_TRUE(parseFixedPoint32("11.1", &val, BIN, 2));
     TEST_ASSERT_EQUAL_UINT32(0b1110, val);
+
+    TEST_ASSERT_TRUE(parseFixedPoint32("123987", &val, DEC, -3));
+    TEST_ASSERT_EQUAL_UINT32(123, val);
+    TEST_ASSERT_TRUE(parseFixedPoint32("111", &val, BIN, -2));
+    TEST_ASSERT_EQUAL_UINT32(1, val);
 }
 
 void test_parse_uint32(void)
