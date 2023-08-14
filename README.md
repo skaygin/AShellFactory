@@ -4,6 +4,6 @@ _ArduinoShell_ is an open source, small footprint and feature rich software libr
 
 Currently working on documentation and building ci/cd, will be avaiable here soon.
 
-Project: https://github.com/skaygin/ArduinoShell
+Project: https://github.com/skaygin/arduino-shell
 
-Documentation: https://skaygin.github.io/ArduinoShell/
+Documentation: https://skaygin.github.io/arduino-shell

@@ -3,21 +3,18 @@
   "version": "0.8.0",
   "keywords": "shell,cli,command,arduino",
   "description": "A small footprint and feature rich software library for Arduino compatible boards to provide CLI (command line interface) for the firmware easily and reliably.",
-  "authors":
-  [
+  "authors": [
     {
-        "name": "Serkan KAYGIN",
-        "url": "https://github.com/skaygin"
+      "name": "Serkan KAYGIN",
+      "url": "https://github.com/skaygin"
     }
   ],
-  "repository":
-  {
+  "repository": {
     "type": "git",
-    "url": "https://github.com/skaygin/ArduinoShell.git"
+    "url": "https://github.com/skaygin/arduino-shell.git"
   },
   "frameworks": "arduino",
-  "platforms": 
-  [
+  "platforms": [
     "atmelavr"
   ]
 }
